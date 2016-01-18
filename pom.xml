@@ -13,6 +13,7 @@
   <modules>
         <module>tws-data</module>
       <module>tws-activemq</module>
+    <module>tws-db</module>
   </modules>
 
   <properties>
