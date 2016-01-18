@@ -10,11 +10,8 @@ import org.springframework.stereotype.Repository;
  * Created by yijunmao on 1/17/16.
  */
 
-@Repository
 public class TickDAO extends CassandraBaseDAO<Tick> {
 
-    @Autowired
-    @Qualifier("stockSession")
     private Session session;
 
     public TickDAO(Session session) {

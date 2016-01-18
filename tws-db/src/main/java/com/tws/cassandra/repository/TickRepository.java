@@ -3,6 +3,7 @@ package com.tws.cassandra.repository;
 import com.tws.cassandra.dao.TickDAO;
 import com.tws.cassandra.model.Tick;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -21,4 +22,5 @@ public class TickRepository {
     public Tick get(Tick tick) {
         return tickDAO.get(tick);
     }
+
 }

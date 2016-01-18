@@ -1,21 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>modules</artifactId>
+        <groupId>com.tws</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tws</groupId>
-    <artifactId>modules</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <artifactId>tws-api</artifactId>
+    <packaging>jar</packaging>
 
-    <name>tws multi-modules</name>
+    <name>tws-api</name>
     <url>http://maven.apache.org</url>
-
-    <modules>
-        <module>tws-api</module>
-        <module>tws-activemq</module>
-        <module>tws-db</module>
-        <module>tws-data</module>
-    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,5 +25,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>
