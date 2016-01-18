@@ -1,30 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>modules</artifactId>
+        <groupId>com.tws</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.chris.tws</groupId>
-    <artifactId>tws-data</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>tws-activemq</artifactId>
     <packaging>jar</packaging>
 
-    <name>tws-data</name>
+    <name>tws-activemq</name>
     <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-
     <dependencies>
-
-        <!--tws-->
-        <dependency>
-            <groupId>com.tws</groupId>
-            <artifactId>tws-activemq</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -32,15 +25,16 @@
             <scope>test</scope>
         </dependency>
 
+        <!--activemq-->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.13</version>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-spring</artifactId>
+            <version>5.13.0</version>
         </dependency>
         <dependency>
-            <groupId>com.tws</groupId>
-            <artifactId>tws-api</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.13.0</version>
         </dependency>
 
         <!--spring framework-->
@@ -61,7 +55,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -70,18 +63,18 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>process</goal>
+                            <goal>bundle</goal>
                         </goals>
                         <configuration>
-                            <resourceBundles>
-                                <resourcebundle>com.tws:tws-activemq:1.0-SNAPSHOT</resourcebundle>
-                            </resourceBundles>
+                            <includes>
+                                <include>**/*.xml</include>
+                                <include>**/*.properties</include>
+                            </includes>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 
 </project>

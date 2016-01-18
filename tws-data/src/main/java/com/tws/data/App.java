@@ -19,7 +19,7 @@ public class App {
 
         System.out.println("Hello World!");
         logger.info("hello slf4j");
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("data-spring.xml");
         App app = (App) context.getBean("app");
         app.connection.connect();
         EClientSocket client = app.connection.getClient();

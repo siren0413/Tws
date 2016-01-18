@@ -2,8 +2,12 @@ package com.tws.data;
 
 
 import com.ib.client.*;
+import com.tws.activemq.TwsMessageSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.jms.Topic;
 
 /**
  * Created by chris on 1/17/16.
@@ -12,9 +16,16 @@ public class LoggingEWrapper implements EWrapper {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingEWrapper.class);
 
+    @Autowired
+    private TwsMessageSender twsMessageSender;
+
+    @Autowired
+    private Topic tickQuoteTopic;
+
     @Override
     public void tickPrice(int tickerId, int field, double price, int canAutoExecute) {
         logger.info(EWrapperMsgGenerator.tickPrice(tickerId, field, price, canAutoExecute));
+        twsMessageSender.send(tickQuoteTopic, EWrapperMsgGenerator.tickPrice(tickerId, field, price, canAutoExecute));
     }
 
     @Override
