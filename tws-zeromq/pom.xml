@@ -1,24 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>modules</artifactId>
+        <groupId>com.tws</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tws</groupId>
-    <artifactId>modules</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <artifactId>tws-zeromq</artifactId>
+    <packaging>jar</packaging>
 
-    <name>tws multi-modules</name>
+    <name>tws-zeromq</name>
     <url>http://maven.apache.org</url>
-
-    <modules>
-        <module>tws-api</module>
-        <module>tws-activemq</module>
-        <module>tws-db</module>
-        <module>tws-data</module>
-        <module>tws-repository</module>
-        <module>tws-zeromq</module>
-        <module>tws-shared</module>
-    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,6 +24,10 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.zeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.3.5</version>
+        </dependency>
     </dependencies>
-
 </project>

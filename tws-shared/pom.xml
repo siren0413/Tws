@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>tws-db</artifactId>
+    <artifactId>tws-shared</artifactId>
     <packaging>jar</packaging>
 
-    <name>tws-db</name>
+    <name>tws-shared</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -19,27 +19,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.tws</groupId>
-            <artifactId>tws-shared</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>2.1.12</version>
-        </dependency>
-        <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-mapping</artifactId>
             <version>2.1.9</version>
         </dependency>
-
         <!--spring framework-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -57,12 +40,12 @@
             <version>4.2.4.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-cassandra</artifactId>
-            <version>1.3.2.RELEASE</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -84,5 +67,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

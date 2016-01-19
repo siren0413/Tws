@@ -15,6 +15,7 @@
     <!-- connection pool -->
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL" value="${activemq.broker.url}"/>
+        <property name="alwaysSessionAsync" value="true"/>
     </bean>
     <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"  destroy-method="stop">
         <property name="connectionFactory" ref="activemqConnectionFactory"/>
@@ -29,10 +30,11 @@
 
     <!-- message listener -->
     <bean id="stdoutMessageListener" class="com.tws.activemq.StdoutMessageListener"/>
+    <bean id="cassandraMessageListener" class="com.tws.activemq.CassandraMessageListener"/>
 
     <bean id="tickQuoteListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="messageListener" ref="stdoutMessageListener"/>
+        <property name="messageListener" ref="cassandraMessageListener"/>
         <property name="destination" ref="tickQuoteTopic"/>
     </bean>
 
@@ -41,6 +43,7 @@
         <property name="connectionFactory" ref="jmsConnectionFactory"/>
         <property name="defaultDestination" ref="tickQuoteTopic"/>
         <property name="pubSubDomain" value="true"/>
+        <property name="deliveryPersistent" value="false"/>
     </bean>
 
 </beans>

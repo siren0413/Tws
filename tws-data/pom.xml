@@ -14,10 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-
     <dependencies>
-
         <!--tws-->
         <dependency>
             <groupId>com.tws</groupId>
@@ -27,6 +24,11 @@
         <dependency>
             <groupId>com.tws</groupId>
             <artifactId>tws-db</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tws</groupId>
+            <artifactId>tws-shared</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
@@ -80,7 +82,7 @@
                         <configuration>
                             <resourceBundles>
                                 <resourcebundle>com.tws:tws-activemq:1.0-SNAPSHOT</resourcebundle>
-                                <resourcebundle>com.tws:tws-db:1.0-SNAPSHOT</resourcebundle>
+                                <resourcebundle>com.tws:tws-shared:1.0-SNAPSHOT</resourcebundle>
                             </resourceBundles>
                         </configuration>
                     </execution>

@@ -6,16 +6,16 @@
 
     <context:property-placeholder location="classpath:*.properties"/>
     <import resource="classpath:activemq-spring.xml" />
-    <import resource="classpath:cassandra-spring.xml" />
+    <import resource="classpath:shared-spring.xml" />
 
 
     <bean id="loggingEWrapper" class="com.tws.data.LoggingEWrapper"/>
-    <bean id="dbEWrapper" class="com.tws.data.DBEWrapper"/>
+    <bean id="messageEWrapper" class="com.tws.data.MessageEWrapper"/>
 
     <bean id="eJavaSignal" class="com.ib.client.EJavaSignal"/>
     <bean id="connection" class="com.tws.data.Connection">
         <property name="signal" ref="eJavaSignal"/>
-        <property name="wrapper" ref="dbEWrapper"/>
+        <property name="wrapper" ref="messageEWrapper"/>
         <property name="host" value="${tws.host}"/>
         <property name="port" value="${tws.port}"/>
         <property name="clientId" value="${tws.clientId}"/>
@@ -26,5 +26,7 @@
     <bean id="app" class="com.tws.data.App">
         <property name="connection" ref="connection"/>
     </bean>
+
+    <bean id="tickCache" class="com.tws.data.TickCache"/>
 
 </beans>

@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>tws-db</artifactId>
+    <artifactId>tws-repository</artifactId>
     <packaging>jar</packaging>
 
-    <name>tws-db</name>
+    <name>tws-repository</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -18,6 +18,16 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.tws</groupId>
+            <artifactId>tws-activemq</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tws</groupId>
+            <artifactId>tws-db</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.tws</groupId>
             <artifactId>tws-shared</artifactId>
@@ -28,16 +38,6 @@
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>2.1.12</version>
-        </dependency>
-        <dependency>
-            <groupId>com.datastax.cassandra</groupId>
-            <artifactId>cassandra-driver-mapping</artifactId>
-            <version>2.1.9</version>
         </dependency>
 
         <!--spring framework-->
@@ -56,11 +56,6 @@
             <artifactId>spring-beans</artifactId>
             <version>4.2.4.RELEASE</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-cassandra</artifactId>
-            <version>1.3.2.RELEASE</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -71,18 +66,18 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>bundle</goal>
+                            <goal>process</goal>
                         </goals>
                         <configuration>
-                            <includes>
-                                <include>**/*.xml</include>
-                                <include>**/*.properties</include>
-                            </includes>
+                            <resourceBundles>
+                                <resourcebundle>com.tws:tws-activemq:1.0-SNAPSHOT</resourcebundle>
+                                <resourcebundle>com.tws:tws-shared:1.0-SNAPSHOT</resourcebundle>
+                                <resourcebundle>com.tws:tws-db:1.0-SNAPSHOT</resourcebundle>
+                            </resourceBundles>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>

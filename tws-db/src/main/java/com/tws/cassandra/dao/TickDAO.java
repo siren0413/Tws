@@ -1,10 +1,7 @@
 package com.tws.cassandra.dao;
 
 import com.datastax.driver.core.Session;
-import com.tws.cassandra.model.Tick;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
+import com.tws.shared.model.Tick;
 
 /**
  * Created by yijunmao on 1/17/16.

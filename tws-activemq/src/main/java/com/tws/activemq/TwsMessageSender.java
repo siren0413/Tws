@@ -20,12 +20,14 @@ public class TwsMessageSender {
     @Autowired
     private JmsTemplate jmsTemplate;
 
-    public void send(final Destination dest, final String text) {
+    public void send(final Destination dest, final String text, final int type) {
 
         this.jmsTemplate.send(dest, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
-                return session.createTextMessage(text);
+                Message msg = session.createTextMessage(text);
+                msg.setIntProperty("type", type);
+                return msg;
             }
         });
     }

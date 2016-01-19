@@ -18,6 +18,6 @@ public class App
         ApplicationContext context = new ClassPathXmlApplicationContext("activemq-spring.xml");
         TwsMessageSender sender = (TwsMessageSender)context.getBean("twsMessageSender");
         Topic tickQuote = new ActiveMQTopic("tickQuote");
-        sender.send(tickQuote, "tickquote sent.");
+        sender.send(tickQuote, "tickquote sent.",0);
     }
 }

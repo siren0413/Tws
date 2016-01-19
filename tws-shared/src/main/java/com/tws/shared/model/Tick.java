@@ -1,4 +1,4 @@
-package com.tws.cassandra.model;
+package com.tws.shared.model;
 
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;
@@ -11,7 +11,7 @@ import com.datastax.driver.mapping.annotations.Table;
 @Table(keyspace = "stock", name = "tick", readConsistency = "ANY", writeConsistency = "ANY")
 public class Tick {
     @PartitionKey
-    private String symbol;
+    private int symbol;
     @ClusteringColumn
     private long timestamp;
     private double lastPrice;
@@ -22,12 +22,18 @@ public class Tick {
     private int lastSize;
     private int totalVolume;
 
+    public Tick() {
+    }
 
-    public String getSymbol() {
+    public Tick(int symbol) {
+        this.symbol = symbol;
+    }
+
+    public int getSymbol() {
         return symbol;
     }
 
-    public void setSymbol(String symbol) {
+    public void setSymbol(int symbol) {
         this.symbol = symbol;
     }
 

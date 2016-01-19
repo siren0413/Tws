@@ -22,6 +22,8 @@
         <beans:constructor-arg ref="stockSession"/>
     </beans:bean>
 
+    <beans:bean id="tickRepository" class="com.tws.cassandra.repository.TickRepository"/>
+
 
 
 </beans:beans>

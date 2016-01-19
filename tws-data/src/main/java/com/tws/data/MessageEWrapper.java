@@ -1,32 +1,49 @@
 package com.tws.data;
 
 import com.ib.client.*;
-import com.tws.cassandra.model.Tick;
-import com.tws.cassandra.repository.TickRepository;
+import com.tws.activemq.TwsMessageSender;
+import com.tws.shared.MsgType;
+import com.tws.shared.marshall.TickerMarshaller;
+import com.tws.shared.model.Tick;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Created by yijunmao on 1/17/16.
- */
-public class DBEWrapper implements EWrapper {
+import javax.jms.Topic;
 
-    private static final Logger logger = LoggerFactory.getLogger(DBEWrapper.class);
+/**
+ * Created by chris on 1/18/16.
+ */
+public class MessageEWrapper implements EWrapper {
+
+    private static final Logger logger = LoggerFactory.getLogger(MessageEWrapper.class);
 
     @Autowired
-    private TickRepository tickRepository;
+    private TwsMessageSender twsMessageSender;
+
+    @Autowired
+    private Topic tickQuoteTopic;
+
+    @Autowired
+    private TickCache tickCache;
+
+    @Autowired
+    private TickerMarshaller tickerMarshaller;
 
     public void tickPrice(int tickerId, int field, double price, int canAutoExecute) {
-        Tick tick = new Tick();
-        tick.setSymbol("AAPL");
-        tick.setTimestamp(System.currentTimeMillis());
-        tick.setLastPrice(price);
-        tickRepository.save(tick);
+        Tick tick = tickCache.updateTickPrice(tickerId, field, price);
+        if (tick != null) {
+            String tickStr = tickerMarshaller.marshal(tick);
+            twsMessageSender.send(tickQuoteTopic, tickStr, MsgType.TICK.index());
+        }
     }
 
     public void tickSize(int tickerId, int field, int size) {
-
+        Tick tick = tickCache.updateTickSize(tickerId, field, size);
+        if (tick != null) {
+            String tickStr = tickerMarshaller.marshal(tick);
+            twsMessageSender.send(tickQuoteTopic, tickStr, MsgType.TICK.index());
+        }
     }
 
     public void tickOptionComputation(int tickerId, int field, double impliedVol, double delta, double optPrice, double pvDividend, double gamma, double vega, double theta, double undPrice) {
@@ -38,7 +55,11 @@ public class DBEWrapper implements EWrapper {
     }
 
     public void tickString(int tickerId, int tickType, String value) {
-
+        Tick tick = tickCache.updateTickString(tickerId, tickType, value);
+        if (tick != null) {
+            String tickStr = tickerMarshaller.marshal(tick);
+            twsMessageSender.send(tickQuoteTopic, tickStr, MsgType.TICK.index());
+        }
     }
 
     public void tickEFP(int tickerId, int tickType, double basisPoints, String formattedBasisPoints, double impliedFuture, int holdDays, String futureLastTradeDate, double dividendImpact, double dividendsToLastTradeDate) {
@@ -201,19 +222,16 @@ public class DBEWrapper implements EWrapper {
 
     }
 
-    @Override
     public void error(Exception e) {
-        logger.error(EWrapperMsgGenerator.error(e));
+
     }
 
-    @Override
     public void error(String str) {
-        logger.error(EWrapperMsgGenerator.error(str));
+
     }
 
-    @Override
     public void error(int id, int errorCode, String errorMsg) {
-        logger.error(EWrapperMsgGenerator.error(id, errorCode, errorMsg));
+
     }
 
     public void connectionClosed() {
