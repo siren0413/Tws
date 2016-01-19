@@ -15,4 +15,13 @@
     </bean>
 
 
+    <bean id="stdoutMessageListener" class="com.tws.activemq.StdoutMessageListener"/>
+    <bean id="cassandraMessageListener" class="com.tws.activemq.CassandraMessageListener"/>
+
+    <bean id="tickQuoteListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="messageListener" ref="cassandraMessageListener"/>
+        <property name="destination" ref="tickQuoteTopic"/>
+    </bean>
+
 </beans>

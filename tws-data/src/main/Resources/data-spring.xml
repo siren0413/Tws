@@ -29,4 +29,14 @@
 
     <bean id="tickCache" class="com.tws.data.TickCache"/>
 
+    <bean id="contractMapper" class="com.tws.data.ContractMapper"/>
+    <bean id="contractRegister" class="com.tws.data.ContractRegister">
+        <property name="contractMapper" ref="contractMapper"/>
+        <property name="client" ref="clientFactory"/>
+    </bean>
+
+    <bean id="clientFactory" class="com.tws.data.ClientFactory">
+        <property name="connection" ref="connection"/>
+    </bean>
+
 </beans>

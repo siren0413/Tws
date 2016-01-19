@@ -29,14 +29,14 @@
     </bean>
 
     <!-- message listener -->
-    <bean id="stdoutMessageListener" class="com.tws.activemq.StdoutMessageListener"/>
-    <bean id="cassandraMessageListener" class="com.tws.activemq.CassandraMessageListener"/>
+    <!--<bean id="stdoutMessageListener" class="com.tws.activemq.StdoutMessageListener"/>-->
+    <!--<bean id="cassandraMessageListener" class="com.tws.activemq.CassandraMessageListener"/>-->
 
-    <bean id="tickQuoteListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="messageListener" ref="cassandraMessageListener"/>
-        <property name="destination" ref="tickQuoteTopic"/>
-    </bean>
+    <!--<bean id="tickQuoteListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="jmsConnectionFactory"/>-->
+        <!--<property name="messageListener" ref="cassandraMessageListener"/>-->
+        <!--<property name="destination" ref="tickQuoteTopic"/>-->
+    <!--</bean>-->
 
     <!--message publisher-->
     <bean id="myJmsTemplate" class="org.springframework.jms.core.JmsTemplate">

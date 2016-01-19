@@ -25,9 +25,9 @@ public class App {
         Contract contract = new Contract();
         contract.secType(Types.SecType.STK);
         contract.currency("USD");
-        contract.symbol("AAPL");
+        contract.symbol("DJX");
         contract.exchange("SMART");
-        contract.primaryExch("BATS");
+        contract.primaryExch("ARCA");
         client.reqMktData(1, contract, App.ALL_GENERIC_TICK_TAGS, false, null);
         //client.reqMktDepth(1, contract, 50, null);
     }

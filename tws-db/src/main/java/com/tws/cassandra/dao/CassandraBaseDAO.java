@@ -17,7 +17,7 @@ public abstract class CassandraBaseDAO<T> implements InitializingBean {
     private Class<T> type;
 
     public void save(T entity) {
-        mapper.save(entity);
+        mapper.saveAsync(entity);
     }
 
     public T get(T entity) {
