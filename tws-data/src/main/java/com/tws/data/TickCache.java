@@ -3,6 +3,7 @@ package com.tws.data;
 import com.ib.client.TickType;
 import com.tws.shared.Symbol;
 import com.tws.shared.model.Tick;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,40 +20,40 @@ public class TickCache implements InitializingBean {
 
     Map<Integer, Tick> tickCache;
 
-    public Tick updateTickPrice(int tickerId, int field, double price) {
-        Tick tick = tickCache.get(tickerId);
+    public void updateTickPrice(int tickerId, int field, double price) {
+        Tick lastTick = tickCache.get(tickerId);
         switch (field) {
             case 1:
-                tick.setBidPrice(price);
+                lastTick.setBidPrice(price);
                 break;
             case 2:
-                tick.setAskPrice(price);
+                lastTick.setAskPrice(price);
                 break;
             case 4:
-                tick.setLastPrice(price);
+                lastTick.setLastPrice(price);
                 break;
             default:
-                logger.error("updateTickPrice: unknown ticker field [{}], text: [{}]", field, TickType.getField(field));
+                logger.error("updateTickPrice: unknown ticker field [{}], text: [{}], value: [{}]", field, TickType.getField(field), price);
         }
         long timestamp = System.currentTimeMillis();
-        if (timestamp == tick.getTimestamp()) {
-            return null;
+        // reset timestamp to force updateTickSize() to update tick.
+        if (timestamp == lastTick.getTimestamp()) {
+            timestamp = 0;
         }
-        tick.setTimestamp(timestamp);
-        return tick;
+        lastTick.setTimestamp(timestamp);
     }
 
     public Tick updateTickSize(int tickerId, int field, int size) {
-        Tick tick = tickCache.get(tickerId);
+        Tick lastTick = tickCache.get(tickerId);
         switch (field) {
             case 0:
-                tick.setBidSize(size);
+                lastTick.setBidSize(size);
                 break;
             case 3:
-                tick.setAskSize(size);
+                lastTick.setAskSize(size);
                 break;
             case 5:
-                tick.setLastSize(size);
+                lastTick.setLastSize(size);
                 break;
             case 8:
                 break;
@@ -60,24 +61,27 @@ public class TickCache implements InitializingBean {
                 logger.error("updateTickSize: unknown ticker field [{}], text: [{}], size: [{}]", field, TickType.getField(field), size);
         }
         long timestamp = System.currentTimeMillis();
-        if (timestamp == tick.getTimestamp()) {
+        if (timestamp == lastTick.getTimestamp()) {
             return null;
         }
-        tick.setTimestamp(timestamp);
-        return tick;
+
+        lastTick.setTimestamp(timestamp);
+        Tick newTick = SerializationUtils.clone(lastTick);
+        resetLastTick(lastTick);
+        return newTick;
     }
 
     public Tick updateTickString(int tickerId, int tickType, String value) {
-        Tick tick = tickCache.get(tickerId);
+        Tick lastTick = tickCache.get(tickerId);
         switch (tickType) {
             case 48:
                 String[] parts = value.split(";");
-                if (parts.length < 6){
+                if (parts.length < 6) {
                     logger.error("RTVolume parts [{}] < 6", parts.length);
                     return null;
                 }
                 int volume = Integer.valueOf(parts[3]);
-                tick.setTotalVolume(volume);
+                lastTick.setTotalVolume(volume);
                 break;
             case 45:
                 break;
@@ -85,13 +89,16 @@ public class TickCache implements InitializingBean {
                 logger.error("updateTickString: unknown ticker field [{}], text: [{}], value: [{}]", tickType, TickType.getField(tickType), value);
         }
         long timestamp = System.currentTimeMillis();
-        if (timestamp == tick.getTimestamp()) {
+        if (timestamp == lastTick.getTimestamp()) {
             return null;
         }
-        tick.setTimestamp(timestamp);
-        return tick;
+        lastTick.setTimestamp(timestamp);
+        return SerializationUtils.clone(lastTick);
     }
 
+    private void resetLastTick(Tick tick) {
+        tick.setLastSize(0);
+    }
 
     public void afterPropertiesSet() throws Exception {
         tickCache = new HashMap<Integer, Tick>();

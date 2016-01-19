@@ -4,12 +4,14 @@ import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 
+import java.io.Serializable;
+
 /**
  * Created by yijunmao on 1/17/16.
  */
 
 @Table(keyspace = "stock", name = "tick", readConsistency = "ANY", writeConsistency = "ANY")
-public class Tick {
+public class Tick implements Serializable {
     @PartitionKey
     private int symbol;
     @ClusteringColumn

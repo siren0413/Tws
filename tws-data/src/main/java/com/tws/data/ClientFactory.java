@@ -22,7 +22,9 @@ public class ClientFactory implements FactoryBean<EClientSocket>{
         while(!connection.isConnected()){
             logger.error("not connected to tws, wait 5 sec and try again...");
             Thread.sleep(5000);
-            connection.connect();
+            if(!connection.isConnected()) {
+                connection.connect();
+            }
         }
         return connection.getClient();
     }

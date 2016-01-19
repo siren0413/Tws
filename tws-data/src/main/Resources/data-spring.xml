@@ -22,11 +22,6 @@
         <property name="asyncConnection" value="${tws.connection.async}"/>
         <property name="poolSize" value="${tws.connection.pool.size}"/>
     </bean>
-
-    <bean id="app" class="com.tws.data.App">
-        <property name="connection" ref="connection"/>
-    </bean>
-
     <bean id="tickCache" class="com.tws.data.TickCache"/>
 
     <bean id="contractMapper" class="com.tws.data.ContractMapper"/>

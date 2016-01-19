@@ -31,11 +31,11 @@ public class MessageEWrapper implements EWrapper {
     private TickerMarshaller tickerMarshaller;
 
     public void tickPrice(int tickerId, int field, double price, int canAutoExecute) {
-        Tick tick = tickCache.updateTickPrice(tickerId, field, price);
-        if (tick != null) {
-            String tickStr = tickerMarshaller.marshal(tick);
-            twsMessageSender.send(tickQuoteTopic, tickStr, MsgType.TICK.index());
-        }
+        tickCache.updateTickPrice(tickerId, field, price);
+//        if (tick != null) {
+//            String tickStr = tickerMarshaller.marshal(tick);
+//            twsMessageSender.send(tickQuoteTopic, tickStr, MsgType.TICK.index());
+//        }
     }
 
     public void tickSize(int tickerId, int field, int size) {
