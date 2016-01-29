@@ -16,8 +16,8 @@
         <module>tws-db</module>
         <module>tws-data</module>
         <module>tws-repository</module>
-        <module>tws-zeromq</module>
         <module>tws-shared</module>
+        <module>tws-iqfeed</module>
     </modules>
 
     <properties>
