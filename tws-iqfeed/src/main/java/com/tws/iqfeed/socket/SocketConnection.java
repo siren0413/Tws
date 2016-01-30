@@ -1,4 +1,4 @@
-package com.tws.iqfeed.conn;
+package com.tws.iqfeed.socket;
 
 
 import io.netty.bootstrap.Bootstrap;

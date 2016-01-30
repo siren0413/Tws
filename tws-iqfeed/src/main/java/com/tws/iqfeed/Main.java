@@ -1,8 +1,6 @@
 package com.tws.iqfeed;
 
-import com.tws.iqfeed.conn.Connection;
-import com.tws.iqfeed.conn.SocketClient;
-import com.tws.iqfeed.conn.SocketConnection;
+import com.tws.iqfeed.socket.SocketConnection;
 
 import java.io.IOException;
 
