@@ -2,6 +2,7 @@ package com.tws.iqfeed.conn;
 
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -28,11 +29,11 @@ public class SocketConnection implements Connection {
     }
 
     @Override
-    public void connect() {
-        channelFuture = createBootstrap(new Bootstrap(), eventLoop);
+    public void connect(boolean reconnect) {
+        channelFuture = createBootstrap(new Bootstrap(), eventLoop, reconnect);
     }
 
-    public ChannelFuture createBootstrap(Bootstrap bootstrap, EventLoopGroup eventLoop) {
+    public ChannelFuture createBootstrap(Bootstrap bootstrap, EventLoopGroup eventLoop, boolean reconnect) {
         bootstrap.group(eventLoop);
         bootstrap.option(ChannelOption.TCP_NODELAY, true);
         bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
@@ -40,12 +41,12 @@ public class SocketConnection implements Connection {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-                socketChannel.pipeline().addLast(new SimpleHandler(SocketConnection.this));
+                socketChannel.pipeline().addLast(new SimpleHandler(SocketConnection.this, reconnect));
             }
         });
         bootstrap.remoteAddress(host, port);
-        channelFuture = bootstrap.connect().awaitUninterruptibly();
-        channelFuture.addListener(new ConnectionListener(this));
+        channelFuture = bootstrap.connect();
+        channelFuture.addListener(new ConnectionListener(this, reconnect));
         return channelFuture;
     }
 
@@ -53,8 +54,8 @@ public class SocketConnection implements Connection {
         if (channelFuture == null) {
             logger.error("Failed to send message due to channelFuture not initialized.");
         } else {
-            Channel channel = channelFuture.channel();
-            channel.writeAndFlush(message);
+            Channel channel = channelFuture.awaitUninterruptibly().channel();
+            channel.writeAndFlush(Unpooled.wrappedBuffer(message.getBytes()));
         }
     }
 

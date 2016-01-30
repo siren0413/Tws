@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Runtime.getRuntime().exec("IQConnect.exe -product YIJUN_MAO_11967 -version 1.0 ");
         SocketConnection connection1 = new SocketConnection("127.0.0.1", 9100);
-        connection1.connect();
+        connection1.connect(true);
 //        connection1.send("S,CONNECT\r\n");
 //        connection1.send("S,CONNECT\r\n");
 //        connection1.send("S,CONNECT\r\n");

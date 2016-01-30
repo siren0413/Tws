@@ -8,6 +8,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,23 +20,27 @@ public class SimpleHandler extends SimpleChannelInboundHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleHandler.class);
 
-    private byte[] buffer = new byte[10240];
+    private byte[] buffer = new byte[102400];
 
     private SocketConnection socketConnection;
+    private boolean reconnect;
 
-    public SimpleHandler(SocketConnection socketConnection) {
+    public SimpleHandler(SocketConnection socketConnection, boolean reconnect) {
         this.socketConnection = socketConnection;
+        this.reconnect = reconnect;
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        final EventLoop eventLoop = ctx.channel().eventLoop();
-        eventLoop.schedule(new Runnable() {
-            @Override
-            public void run() {
-                socketConnection.createBootstrap(new Bootstrap(), eventLoop);
-            }
-        }, 1L, TimeUnit.SECONDS);
+        if(reconnect) {
+            final EventLoop eventLoop = ctx.channel().eventLoop();
+            eventLoop.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    socketConnection.createBootstrap(new Bootstrap(), eventLoop, reconnect);
+                }
+            }, 1L, TimeUnit.SECONDS);
+        }
         logger.info("channel inactive");
         super.channelInactive(ctx);
     }
@@ -56,7 +63,8 @@ public class SimpleHandler extends SimpleChannelInboundHandler {
         if (in.isReadable()) {
             int len = in.readableBytes();
             in.getBytes(0, buffer, 0, len);
-            System.out.println(new String(buffer, 0, len));
+            Files.write(Paths.get("haha.txt"), new String(buffer,0,len).getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+//            System.out.println(new String(buffer, 0, len));
         }
     }
 }
