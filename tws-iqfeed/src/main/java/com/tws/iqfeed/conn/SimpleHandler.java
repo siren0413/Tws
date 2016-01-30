@@ -1,14 +1,19 @@
 package com.tws.iqfeed.conn;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.*;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
+import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by admin on 1/29/2016.
  */
-public class SimpleHandler extends SimpleChannelHandler {
+public class SimpleHandler extends SimpleChannelInboundHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleHandler.class);
 
@@ -21,29 +26,37 @@ public class SimpleHandler extends SimpleChannelHandler {
     }
 
     @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        logger.info("Connected to remote [{}]", ctx.getChannel().getRemoteAddress());
-        super.channelConnected(ctx, e);
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        final EventLoop eventLoop = ctx.channel().eventLoop();
+        eventLoop.schedule(new Runnable() {
+            @Override
+            public void run() {
+                socketConnection.createBootstrap(new Bootstrap(), eventLoop);
+            }
+        }, 1L, TimeUnit.SECONDS);
+        logger.info("channel inactive");
+        super.channelInactive(ctx);
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-        logger.info("Disconnected to remote [{}]", ctx.getChannel().getRemoteAddress());
-        super.channelDisconnected(ctx, e);
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        logger.info("channel active");
+        super.channelActive(ctx);
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        ChannelBuffer channelBuffer = (ChannelBuffer) e.getMessage();
-        if (channelBuffer.readable()) {
-            int len = channelBuffer.readableBytes();
-            channelBuffer.getBytes(0, buffer, 0, len);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        logger.error("error", cause);
+        super.exceptionCaught(ctx, cause);
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf in = (ByteBuf) msg;
+        if (in.isReadable()) {
+            int len = in.readableBytes();
+            in.getBytes(0, buffer, 0, len);
             System.out.println(new String(buffer, 0, len));
         }
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-        logger.error("Exception:", e.getCause());
     }
 }
