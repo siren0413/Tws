@@ -38,22 +38,6 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.13</version>
         </dependency>
-        <!--spring framework-->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>4.2.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>4.2.4.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>4.2.4.RELEASE</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,10 +1,8 @@
 package com.tws.iqfeed.grizzly;
 
-import org.glassfish.grizzly.Buffer;
 import org.glassfish.grizzly.filterchain.BaseFilter;
 import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
-import org.glassfish.grizzly.memory.BuffersBuffer;
 
 import java.io.IOException;
 
@@ -21,9 +19,7 @@ public class ClientFilter extends BaseFilter {
      * @return the next action
      * @throws java.io.IOException
      */
-
-    private byte[] b = new byte[8196];
-
+    
     @Override
     public NextAction handleRead(final FilterChainContext ctx) throws IOException {
         // We get String message from the context, because we rely prev. Filter in chain is StringFilter

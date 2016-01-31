@@ -29,7 +29,7 @@ public class AppTest
     }
 
     /**
-     * Rigourous Kafka :-)
+     * Rigourous Test :-)
      */
     public void testApp()
     {
