@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:*.properties"/>
+
+    <bean id="level1Feed" class="com.tws.iqfeed.feed.Level1Feed">
+        <property name="pool" ref="level1FeedPool"/>
+        <property name="symbolString" value="${symbol.list}"/>
+    </bean>
+
+    <bean id="level1FeedPool" class="com.tws.iqfeed.grizzly.ConnectionPool">
+        <property name="host" value="127.0.0.1"/>
+        <property name="port" value="5009"/>
+        <property name="poolSize" value="1"/>
+    </bean>
+
+    <bean id="historyFeed" class="com.tws.iqfeed.feed.HistoryFeed">
+        <property name="pool" ref="historyFeedPool"/>
+    </bean>
+
+    <bean id="historyFeedPool" class="com.tws.iqfeed.grizzly.ConnectionPool">
+        <property name="host" value="127.0.0.1"/>
+        <property name="port" value="9100"/>
+        <property name="poolSize" value="5"/>
+    </bean>
+
+</beans>

@@ -29,8 +29,8 @@ public class ConnectionListener implements ChannelFutureListener {
             loop.schedule(new Runnable() {
                 @Override
                 public void run() {
-                    ChannelFuture newChannelFuture = socketConnection.createBootstrap(new Bootstrap(), loop, reconnect);
-                    socketConnection.setChannelFuture(newChannelFuture);
+//                    ChannelFuture newChannelFuture = socketConnection.createBootstrap(new Bootstrap(), loop, reconnect);
+//                    socketConnection.setChannelFuture(newChannelFuture);
                 }
             }, 1L, TimeUnit.SECONDS);
         }

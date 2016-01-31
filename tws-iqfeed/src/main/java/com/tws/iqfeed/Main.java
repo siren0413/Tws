@@ -16,9 +16,13 @@ public class Main {
 //        connection1.send("S,CONNECT\r\n");
 //        connection1.send("S,CONNECT\r\n");
 
-        String sCommand = String.format("HTX,%s,%s,%s,%s,%s\r\n", "AAPL", "", "", "", "");
-
-        connection1.send(sCommand);
+//        String sCommand = String.format("HTX,%s,%s,%s,%s,%s\r\n", "AAPL", "", "", "", "");
+//        connection1.send(sCommand);
+//
+//        SocketConnection connection2 = new SocketConnection("127.0.0.1", 9100);
+//        connection2.connect(true);
+//        String sCommand2 = String.format("HTX,%s,%s,%s,%s,%s\r\n", "FB", "", "", "", "");
+//        connection2.send(sCommand2);
 //
 //        Connection connection2 = new SocketConnection("127.0.0.1", 9300);
 //        connection2.connect();
