@@ -1,11 +1,14 @@
 package com.tws.iqfeed.feed;
 
+import com.tws.message.KafkaProducer;
 import org.glassfish.grizzly.*;
 import org.glassfish.grizzly.connectionpool.SingleEndpointPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.io.IOException;
 
 
 /**
@@ -24,11 +27,15 @@ public class HistoryFeed implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
     }
 
     public void send(String cmd) {
-        pool.take(new FeedCompletionHandler(cmd));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pool.take(new FeedCompletionHandler(cmd));
+            }
+        }).start();
     }
 
     class FeedCompletionHandler implements CompletionHandler<Connection> {
@@ -53,6 +60,7 @@ public class HistoryFeed implements InitializingBean {
         @Override
         public void completed(Connection connection) {
             connection.write(cmd);
+            pool.release(connection);
         }
 
         @Override

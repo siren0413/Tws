@@ -30,7 +30,7 @@ public class ConnectionPool implements FactoryBean<SingleEndpointPool> {
         filterChainBuilder.add(new TransportFilter());
         filterChainBuilder.add(new StringFilter(Charset.forName("US-ASCII"), "\n"));
         filterChainBuilder.add(new ClientFilter());
-        final TCPNIOTransport transport =
+        TCPNIOTransport transport =
                 TCPNIOTransportBuilder.newInstance().build();
         transport.setProcessor(filterChainBuilder.build());
         transport.start();

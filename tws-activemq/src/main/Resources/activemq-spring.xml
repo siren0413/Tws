@@ -25,7 +25,7 @@
 
     <!-- topic -->
     <bean id="tickQuoteTopic" class="org.apache.activemq.command.ActiveMQTopic">
-        <property name="physicalName" value="${activemq.tickQuote.topic}"/>
+        <property name="physicalName" value="HISTORY_CHANNEL"/>
     </bean>
 
     <!-- message listener -->

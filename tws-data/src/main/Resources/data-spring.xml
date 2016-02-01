@@ -20,7 +20,7 @@
         <property name="port" value="${tws.port}"/>
         <property name="clientId" value="${tws.clientId}"/>
         <property name="asyncConnection" value="${tws.connection.async}"/>
-        <property name="poolSize" value="${tws.connection.pool.size}"/>
+        <property name="numThreads" value="${tws.connection.pool.size}"/>
     </bean>
     <bean id="tickCache" class="com.tws.data.TickCache"/>
 

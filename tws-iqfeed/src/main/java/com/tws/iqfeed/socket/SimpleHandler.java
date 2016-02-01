@@ -8,9 +8,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -63,8 +61,7 @@ public class SimpleHandler extends SimpleChannelInboundHandler {
         if (in.isReadable()) {
             int len = in.readableBytes();
             in.getBytes(0, buffer, 0, len);
-            Files.write(Paths.get("haha.txt"), new String(buffer,0,len).getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-//            System.out.println(new String(buffer, 0, len));
+            System.out.println(new String(buffer, 0, len));
         }
     }
 }

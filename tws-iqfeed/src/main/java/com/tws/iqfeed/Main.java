@@ -1,6 +1,9 @@
 package com.tws.iqfeed;
 
+import com.tws.iqfeed.netty.HistorySocket;
 import com.tws.iqfeed.socket.SocketConnection;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
 
@@ -9,9 +12,9 @@ import java.io.IOException;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        Runtime.getRuntime().exec("IQConnect.exe -product YIJUN_MAO_11967 -version 1.0 ");
-        SocketConnection connection1 = new SocketConnection("127.0.0.1", 9100);
-        connection1.connect(true);
+//        Runtime.getRuntime().exec("IQConnect.exe -product YIJUN_MAO_11967 -version 1.0 ");
+//        SocketConnection connection1 = new SocketConnection("127.0.0.1", 9300);
+//        connection1.connect(true);
 //        connection1.send("S,CONNECT\r\n");
 //        connection1.send("S,CONNECT\r\n");
 //        connection1.send("S,CONNECT\r\n");
@@ -31,6 +34,11 @@ public class Main {
 //        Connection connection3 = new SocketConnection("127.0.0.1", 9300);
 //        connection3.connect();
 //        connection3.send("S,CONNECT\r\n");
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("iqfeed-spring.xml");
+        ctx.getBean("level1Socket");
+        HistorySocket socket = (HistorySocket) ctx.getBean("historySocket");
+        socket.send("HTX,AAPL,,,AAPL,\r\n");
+        socket.send("HTX,FB,,,FB,\r\n");
 
     }
 }

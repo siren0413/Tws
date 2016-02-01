@@ -12,14 +12,25 @@
         <property name="zookeeperConnect" value="${zookeeper.connect}"/>
     </bean>
 
-    <bean id="consumer" class="com.tws.message.KafkaConsumer">
-        <property name="defaultProperties" ref="defaultProperties"/>
-        <property name="messageListener" ref="testMessageListener"/>
+    <!--<bean id="consumer" class="com.tws.message.KafkaConsumer">-->
+        <!--<property name="defaultProperties" ref="defaultProperties"/>-->
+        <!--<property name="messageListener" ref="testMessageListener"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="testMessageListener" class="com.tws.TestMessageListener"/>-->
+
+    <!--<bean id="producer" class="com.tws.message.KafkaProducer">-->
+        <!--<property name="defaultProperties" ref="defaultProperties"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="publisher" class="com.tws.zeromq.ZeromqPublisher"/>-->
+
+    <bean id="subscriber" class="com.tws.zeromq.ZeromqSubscriber">
+        <property name="channel" value="HISTORY_CHANNEL"/>
+        <property name="host" value="127.0.0.1"/>
+        <property name="messageListener">
+            <bean class="com.tws.zeromq.MessageListenerImpl"/>
+        </property>
     </bean>
 
-    <bean id="testMessageListener" class="com.tws.TestMessageListener"/>
-
-    <bean id="producer" class="com.tws.message.KafkaProducer">
-        <property name="defaultProperties" ref="defaultProperties"/>
-    </bean>
 </beans>

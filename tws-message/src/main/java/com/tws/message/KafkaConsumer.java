@@ -5,7 +5,6 @@ import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.HashMap;
@@ -18,7 +17,7 @@ import java.util.concurrent.Executors;
 /**
  * Created by admin on 1/30/2016.
  */
-public class KafkaConsumer{
+public class KafkaConsumer {
 
     private ConsumerConnector consumer;
     private int NUM_THREADS = 2;
@@ -36,7 +35,7 @@ public class KafkaConsumer{
         this.messageListener = messageListener;
     }
 
-    public void consume(String topic){
+    public void consume(String topic) {
         Properties prop = defaultProperties.getDefaultConsumer();
         ConsumerConfig consumerConfig = new ConsumerConfig(prop);
         consumer = Consumer.createJavaConsumerConnector(consumerConfig);
@@ -67,7 +66,7 @@ public class KafkaConsumer{
 
         public void run() {
             ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
-            while (it.hasNext()){
+            while (it.hasNext()) {
                 messageListener.messageReceived(new String(it.next().message()));
             }
         }

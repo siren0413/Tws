@@ -21,16 +21,14 @@ public class ConnectionListener implements ChannelFutureListener {
     }
     @Override
     public void operationComplete(ChannelFuture channelFuture) throws Exception {
-        channelFuture.awaitUninterruptibly();
         if (!channelFuture.isSuccess()) {
             System.out.println("Reconnect............");
-            Runtime.getRuntime().exec("IQConnect.exe -product YIJUN_MAO_11967 -version 1.0 ");
             final EventLoop loop = channelFuture.channel().eventLoop();
             loop.schedule(new Runnable() {
                 @Override
                 public void run() {
-//                    ChannelFuture newChannelFuture = socketConnection.createBootstrap(new Bootstrap(), loop, reconnect);
-//                    socketConnection.setChannelFuture(newChannelFuture);
+                    ChannelFuture newChannelFuture = socketConnection.createBootstrap(new Bootstrap(), loop, reconnect);
+                    socketConnection.setChannelFuture(newChannelFuture);
                 }
             }, 1L, TimeUnit.SECONDS);
         }
