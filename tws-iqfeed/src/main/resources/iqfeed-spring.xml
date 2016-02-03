@@ -5,37 +5,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:property-placeholder location="classpath:*.properties"/>
-    <import resource="classpath:message-spring.xml" />
-
-    <!--<bean id="level1Feed" class="com.tws.iqfeed.feed.Level1Feed">-->
-        <!--<property name="pool" ref="level1FeedPool"/>-->
-        <!--<property name="symbolString" value="${symbol.list}"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="level1FeedPool" class="com.tws.iqfeed.grizzly.ConnectionPool">-->
-        <!--<property name="host" value="127.0.0.1"/>-->
-        <!--<property name="port" value="9301"/>-->
-        <!--<property name="numThreads" value="1"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="historyFeed" class="com.tws.iqfeed.feed.HistoryFeed" scope="singleton">-->
-        <!--<property name="pool" ref="historyFeedPool"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="historyFeedPool" class="com.tws.iqfeed.grizzly.ConnectionPool">-->
-        <!--<property name="host" value="localhost"/>-->
-        <!--<property name="port" value="9100"/>-->
-        <!--<property name="numThreads" value="1"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="historyCmdConsumer" class="com.tws.message.KafkaConsumer">-->
-        <!--<property name="defaultProperties" ref="defaultProperties"/>-->
-        <!--<property name="messageListener" ref="historyMessageListener"/>-->
-    <!--</bean>-->
-
-    <!--<bean id="historyMessageListener" class="com.tws.iqfeed.feed.HistoryMessageListener">-->
-        <!--<property name="historyFeed" ref="historyFeed"/>-->
-    <!--</bean>-->
+    <context:component-scan base-package="com.tws"/>
+    <import resource="classpath:message-spring.xml"/>
 
     <bean id="level1Pool" class="com.tws.iqfeed.netty.ConnectionPool">
         <property name="host" value="127.0.0.1"/>
@@ -43,13 +14,17 @@
         <property name="poolSize" value="1"/>
         <property name="fixed" value="true"/>
         <property name="handler">
-            <bean class="com.tws.iqfeed.netty.Level1Handler"/>
+            <bean class="com.tws.iqfeed.netty.Level1Handler">
+                <property name="publisher">
+                    <bean class="com.tws.activemq.ActivemqPublisher"/>
+                </property>
+            </bean>
         </property>
     </bean>
 
     <bean id="level1Socket" class="com.tws.iqfeed.netty.Level1Socket">
         <property name="pool" ref="level1Pool"/>
-        <property name="numThreads" value="1"/>
+        <property name="numThreads" value="2"/>
         <property name="symbolList" value="${symbol.list}"/>
     </bean>
 
@@ -59,7 +34,9 @@
         <property name="fixed" value="false"/>
         <property name="handler">
             <bean class="com.tws.iqfeed.netty.HistoryHandler">
-                <property name="publisher" ref="publisher"/>
+                <property name="publisher">
+                    <bean class="com.tws.activemq.ActivemqPublisher"/>
+                </property>
             </bean>
         </property>
     </bean>
@@ -70,15 +47,15 @@
     </bean>
 
 
-    <bean id="publisher" class="com.tws.zeromq.ZeromqPublisher"/>
-
-    <!--<bean id="subscriber" class="com.tws.zeromq.ZeromqSubscriber">-->
-        <!--<property name="channel" value="history"/>-->
-        <!--<property name="host" value="127.0.0.1"/>-->
-        <!--<property name="messageListener">-->
-            <!--<bean class="com.tws.zeromq.MessageListenerImpl"/>-->
-        <!--</property>-->
-    <!--</bean>-->
-
+    <bean id="level1ListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="autoStartup" value="true"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="sessionTransacted" value="false"/>
+        <property name="destinationName" value="LEVEL1_LISTEN"/>
+        <property name="messageListener">
+            <bean class="com.tws.iqfeed.netty.Level1MessageListener"/>
+        </property>
+    </bean>
 
 </beans>

@@ -28,7 +28,7 @@ public class Command {
             return "S,CONNECT\r\n";
         }
         public static String SELECT_UPDATE_FIELD(){
-            return "S,SELECT UPDATE FIELDS,Bid,Bid Size,Bid Time,Ask,Ask Size,Ask Time,Total Volume,Low,High,Open,Last,Most Recent Trade Date\r\n";
+            return "S,SELECT UPDATE FIELDS,Bid,Bid Size,Bid Time,Ask,Ask Size,Ask Time,Last,Last Size,Last Time,Total Volume,Low,High,Open\r\n";
         }
         public static String SET_PROTOCOL(){
             return "S,SET PROTOCOL,5.2\r\n";

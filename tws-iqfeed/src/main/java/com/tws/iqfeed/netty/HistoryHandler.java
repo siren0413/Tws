@@ -1,5 +1,6 @@
 package com.tws.iqfeed.netty;
 
+import com.tws.activemq.ActivemqPublisher;
 import com.tws.zeromq.ZeromqPublisher;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -14,13 +15,8 @@ import org.springframework.beans.factory.annotation.Required;
 public class HistoryHandler extends SimpleChannelInboundHandler {
 
     private byte[] buffer = new byte[81960];
-    private ZeromqPublisher publisher;
-    private final static String HISTORY_CHANNEL = "HISTORY_CHANNEL";
-
-    @Required
-    public void setPublisher(ZeromqPublisher publisher) {
-        this.publisher = publisher;
-    }
+    private ActivemqPublisher publisher;
+    private final static String HISTORY_CHANNEL = "HISTORY_TOPIC";
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -28,7 +24,12 @@ public class HistoryHandler extends SimpleChannelInboundHandler {
         if (in.isReadable()) {
             int len = in.readableBytes();
             in.getBytes(0, buffer, 0, len);
-            publisher.send(HISTORY_CHANNEL, new String(buffer, 0, len));
+            publisher.publish(HISTORY_CHANNEL, new String(buffer, 0, len));
         }
+    }
+
+    @Required
+    public void setPublisher(ActivemqPublisher publisher) {
+        this.publisher = publisher;
     }
 }

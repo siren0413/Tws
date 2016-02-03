@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.tws</groupId>
-            <artifactId>tws-activemq</artifactId>
+            <artifactId>tws-message</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

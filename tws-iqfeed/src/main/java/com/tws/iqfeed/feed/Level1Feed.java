@@ -40,7 +40,7 @@ public class Level1Feed implements InitializingBean {
             symbolSet.add(symbol);
         }
         if (!queue.offer(symbolSet)) {
-            logger.error("blocking queue is full. queue size [{}]", queue.size());
+            logger.error("blocking symbolQueue is full. symbolQueue size [{}]", queue.size());
         }
         // init default
         defaultCmdSet = new HashSet<>();
