@@ -11,15 +11,6 @@ import java.util.concurrent.Executors;
 public class App {
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("repository-spring.xml");
-        final MessageHandler messageHandler = (MessageHandler) context.getBean("messageHandler");
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        executorService.execute(new Runnable() {
-            public void run() {
-                while (true) {
-                    messageHandler.handle();
-                }
-            }
-        });
-
+        context.registerShutdownHook();
     }
 }

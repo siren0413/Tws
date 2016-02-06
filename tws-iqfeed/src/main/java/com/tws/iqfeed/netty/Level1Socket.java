@@ -12,9 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +26,8 @@ public class Level1Socket implements InitializingBean {
 
     public static BlockingQueue<String> symbolQueue;
     public static BlockingQueue<String> commandQueue;
-    public static final String ATTRIBUTE_KEY = "SYMBOL_SET";
+    public static final String ATTRIBUTE_KEY_SYMBOL = "SYMBOL_SET";
+    public static final String ATTRIBUTE_KEY_INITCMD = "INIT_CMD";
 
     private ChannelPool pool;
     private ExecutorService executor;
@@ -54,10 +53,16 @@ public class Level1Socket implements InitializingBean {
                             if (future.isSuccess()) {
                                 Channel channel = (Channel) future.getNow();
                                 if (channel != null) {
-                                    initFeed();
+                                    Attribute cmdAttr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY_INITCMD));
+                                    if (cmdAttr.get() == null) {
+                                        for (String cmd : getInitCmd()) {
+                                            channel.writeAndFlush(Unpooled.wrappedBuffer(cmd.getBytes()));
+                                        }
+                                        cmdAttr.set(getInitCmd());
+                                    }
                                     String msg = String.format("w%s\r\n", elem);
                                     channel.writeAndFlush(Unpooled.wrappedBuffer(msg.getBytes()));
-                                    Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY));
+                                    Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY_SYMBOL));
                                     Set<String> value = attr.get();
                                     if (value == null) {
                                         value = new HashSet<>();
@@ -109,12 +114,14 @@ public class Level1Socket implements InitializingBean {
         commandQueue.offer(cmd);
     }
 
-    private void initFeed(){
-        send(Command.Level1.CONNECT());
-        send(Command.Level1.NEWS_ON());
-        send(Command.Level1.TIMESTAMP_ON());
-        send(Command.Level1.SET_PROTOCOL());
-        send(Command.Level1.SELECT_UPDATE_FIELD());
+    private List<String> getInitCmd(){
+        List<String> list = new LinkedList<>();
+        list.add(Command.COMMON.CONNECT());
+        list.add(Command.LEVEL1.NEWS_ON());
+        list.add(Command.COMMON.SET_PROTOCOL());
+        list.add(Command.LEVEL1.SELECT_UPDATE_FIELD());
+        list.add(Command.LEVEL1.TIMESTAMP_ON());
+        return list;
     }
 
     @Override
@@ -126,7 +133,6 @@ public class Level1Socket implements InitializingBean {
         while (tokenizer.hasMoreTokens()) {
             symbolQueue.add(tokenizer.nextToken());
         }
-        initFeed();
         start();
     }
 

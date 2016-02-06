@@ -31,6 +31,7 @@
     <bean id="historyPool" class="com.tws.iqfeed.netty.ConnectionPool">
         <property name="host" value="127.0.0.1"/>
         <property name="port" value="9100"/>
+        <!--<property name="poolSize" value="1"/>-->
         <property name="fixed" value="false"/>
         <property name="handler">
             <bean class="com.tws.iqfeed.netty.HistoryHandler">
@@ -43,7 +44,7 @@
 
     <bean id="historySocket" class="com.tws.iqfeed.netty.HistorySocket">
         <property name="pool" ref="historyPool"/>
-        <property name="numThreads" value="1"/>
+        <property name="numThreads" value="2"/>
     </bean>
 
 

@@ -25,11 +25,6 @@
         </dependency>
         <dependency>
             <groupId>com.tws</groupId>
-            <artifactId>tws-db</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tws</groupId>
             <artifactId>tws-shared</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -56,13 +51,21 @@
             <artifactId>spring-beans</artifactId>
             <version>4.2.4.RELEASE</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>1.1.2</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <version>12.0.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-hadoop</artifactId>
+            <version>2.3.0.RELEASE</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -77,9 +80,7 @@
                         </goals>
                         <configuration>
                             <resourceBundles>
-                                <resourcebundle>com.tws:tws-activemq:1.0-SNAPSHOT</resourcebundle>
-                                <resourcebundle>com.tws:tws-shared:1.0-SNAPSHOT</resourcebundle>
-                                <resourcebundle>com.tws:tws-db:1.0-SNAPSHOT</resourcebundle>
+                                <resourcebundle>com.tws:tws-message:1.0-SNAPSHOT</resourcebundle>
                             </resourceBundles>
                         </configuration>
                     </execution>

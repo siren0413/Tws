@@ -5,10 +5,18 @@ package com.tws.iqfeed.common;
  */
 public class Command {
 
-
+    // ***************** COMMON *******************
+    public static class COMMON{
+        public static String CONNECT(){
+            return "S,CONNECT\r\n";
+        }
+        public static String SET_PROTOCOL(){
+            return "S,SET PROTOCOL,5.2\r\n";
+        }
+    }
 
     // ***************** LEVEL 1 *******************
-    public static class Level1{
+    public static class LEVEL1{
         public static String TIMESTAMP_ON(){
             return "S,TIMESTAMPSON\r\n";
         }
@@ -24,17 +32,10 @@ public class Command {
         public static String STATS(){
             return "S,REQUEST STATS\r\n";
         }
-        public static String CONNECT(){
-            return "S,CONNECT\r\n";
-        }
         public static String SELECT_UPDATE_FIELD(){
-            return "S,SELECT UPDATE FIELDS,Bid,Bid Size,Bid Time,Ask,Ask Size,Ask Time,Last,Last Size,Last Time,Total Volume,Low,High,Open\r\n";
+            return "S,SELECT UPDATE FIELDS,Bid,Bid Size,Bid Time,Ask,Ask Size,Ask Time,Last,Last Size,Last Time,Total Volume,Low,High,Open,Delay\r\n";
         }
-        public static String SET_PROTOCOL(){
-            return "S,SET PROTOCOL,5.2\r\n";
-        }
+
     }
-
-
 
 }

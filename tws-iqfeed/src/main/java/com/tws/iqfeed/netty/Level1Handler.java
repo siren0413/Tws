@@ -41,7 +41,7 @@ public class Level1Handler extends SimpleChannelInboundHandler {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channelInactive " + new Date());
         Channel channel = ctx.channel();
-        Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(Level1Socket.ATTRIBUTE_KEY));
+        Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(Level1Socket.ATTRIBUTE_KEY_SYMBOL));
         Set<String> value = attr.get();
         if (value != null) {
             value.forEach(Level1Socket.symbolQueue::offer);

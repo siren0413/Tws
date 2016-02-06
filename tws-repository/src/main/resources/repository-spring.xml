@@ -2,23 +2,37 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xmlns:hdp="http://www.springframework.org/schema/hadoop"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
 
     <context:property-placeholder location="classpath:*.properties"/>
+    <context:component-scan base-package="com.tws.repository"/>
     <import resource="classpath:message-spring.xml" />
     <import resource="classpath:shared-spring.xml" />
+
+    <hdp:configuration id="hadoopConfiguration">
+        fs.defaultFS=hdfs://10.0.1.27:8020
+    </hdp:configuration>
+
+    <hdp:hbase-configuration zk-quorum="${hbase.zk.host}" zk-port="${hbase.zk.port}"/>
+
+    <bean id="hbaseTemplate" class="org.springframework.data.hadoop.hbase.HbaseTemplate">
+        <property name="configuration" ref="hbaseConfiguration"/>
+        <property name="autoFlush" value="true"/>
+    </bean>
 
     <bean id="level1ListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="jmsConnectionFactory"/>
         <property name="autoStartup" value="true"/>
         <property name="pubSubDomain" value="true"/>
         <property name="sessionTransacted" value="false"/>
-        <property name="destinationName" value="LEVEL1_FEED"/>
+        <property name="destinationName" value="HISTORY_TOPIC"/>
         <property name="messageListener">
-            <bean class="com.tws.iqfeed.netty.Level1MessageListener"/>
+            <bean class="com.tws.repository.HistoryFeedListener"/>
         </property>
     </bean>
-
-
 
 </beans>

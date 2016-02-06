@@ -43,12 +43,12 @@ public class Level1Feed implements InitializingBean {
             logger.error("blocking symbolQueue is full. symbolQueue size [{}]", queue.size());
         }
         // init default
-        defaultCmdSet = new HashSet<>();
-        defaultCmdSet.add(Command.Level1.CONNECT());
-        defaultCmdSet.add(Command.Level1.SET_PROTOCOL());
-        defaultCmdSet.add(Command.Level1.TIMESTAMP_ON());
-        defaultCmdSet.add(Command.Level1.NEWS_ON());
-        defaultCmdSet.add(Command.Level1.SELECT_UPDATE_FIELD());
+//        defaultCmdSet = new HashSet<>();
+//        defaultCmdSet.add(Command.Level1.CONNECT());
+//        defaultCmdSet.add(Command.Level1.SET_PROTOCOL());
+//        defaultCmdSet.add(Command.Level1.TIMESTAMP_ON());
+//        defaultCmdSet.add(Command.Level1.NEWS_ON());
+//        defaultCmdSet.add(Command.Level1.SELECT_UPDATE_FIELD());
     }
 
     public void startFeed() {

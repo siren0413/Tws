@@ -1,6 +1,7 @@
 package com.tws.iqfeed;
 
 import com.tws.controller.HistorySocketController;
+import com.tws.iqfeed.common.Command;
 import com.tws.iqfeed.netty.HistorySocket;
 import com.tws.iqfeed.socket.SocketConnection;
 import org.springframework.boot.SpringApplication;
@@ -45,6 +46,7 @@ public class Main {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("iqfeed-spring.xml");
         ctx.getBean("level1Socket");
         HistorySocket socket = (HistorySocket) ctx.getBean("historySocket");
+//        socket.send(Command.Level1.SET_PROTOCOL());
 //        socket.send("HTX,AAPL,,,AAPL,\r\n");
 //        socket.send("HTX,FB,,,FB,\r\n");
 
