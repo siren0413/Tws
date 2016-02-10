@@ -69,7 +69,7 @@ public class Level1Socket implements InitializingBean {
                                     }
                                     String msg = String.format("w%s\r\n", elem);
                                     channel.writeAndFlush(Unpooled.wrappedBuffer(msg.getBytes()));
-                                    logger.info("Request feed of symbol [{}] to [{}]", elem, channel.remoteAddress());
+                                    logger.info("Request feed of symbol [{}], channel: {}", elem, channel.toString());
                                     Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY_SYMBOL));
                                     Set<String> value = attr.get();
                                     if (value == null) {
@@ -105,6 +105,7 @@ public class Level1Socket implements InitializingBean {
                             if (future.isSuccess()) {
                                 Channel channel = (Channel) future.getNow();
                                 if (channel != null) {
+                                    logger.info("Send command: [{}], channel: {}", cmd.replace("\r\n", ""), channel.toString());
                                     channel.writeAndFlush((Unpooled.wrappedBuffer(cmd.getBytes())));
                                     pool.release(channel);
                                 }
@@ -118,21 +119,21 @@ public class Level1Socket implements InitializingBean {
         }
     }
 
-    class ChannelQueueWorker implements Runnable{
+    class ChannelQueueWorker implements Runnable {
 
         private Queue<Channel> queue = new LinkedList<>();
 
         @Override
         public void run() {
-            while(true){
+            while (true) {
                 try {
                     Channel channel = channelQueue.take();
                     queue.add(channel);
-                    if(queue.size() == poolSize){
+                    if (queue.size() == poolSize) {
                         Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY_SYMBOL));
-                        logger.info("ChannelQueue is full with size [{}], pop first channel back to pool. attr size {}", poolSize, attr.get().size());
+                        logger.debug("ChannelQueue is full with size [{}], pop first channel back to pool. attr size {}", poolSize, attr.get().size());
                         Channel polledChannel = queue.poll();
-                        if(polledChannel != null) {
+                        if (polledChannel != null) {
                             pool.release(polledChannel);
                         }
                     }
@@ -143,11 +144,11 @@ public class Level1Socket implements InitializingBean {
         }
     }
 
-    public void send(String cmd){
+    public void send(String cmd) {
         commandQueue.offer(cmd);
     }
 
-    private List<String> getInitCmd(){
+    private List<String> getInitCmd() {
         List<String> list = new LinkedList<>();
         list.add(Command.COMMON.CONNECT());
         list.add(Command.LEVEL1.NEWS_ON());

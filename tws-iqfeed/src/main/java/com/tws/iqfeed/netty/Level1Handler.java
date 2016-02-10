@@ -38,7 +38,17 @@ public class Level1Handler extends SimpleChannelInboundHandler {
         if (in.isReadable()) {
             int len = in.readableBytes();
             in.getBytes(0, buffer, 0, len);
-            publisher.publish(LEVEL1_TOPIC, new String(buffer, 0, len));
+            String message = new String(buffer, 0, len).trim();
+            MessageTypeFilter.TYPE type = MessageTypeFilter.filterLevel1Msg(message);
+            switch (type){
+                case ERROR:
+                    logger.error("received error message: " + message);
+                    break;
+                case SYMBOL_NOT_FOUND:
+                    logger.error("symbol not found: " + message);
+                    break;
+            }
+            publisher.publish(LEVEL1_TOPIC, message);
         }
     }
 

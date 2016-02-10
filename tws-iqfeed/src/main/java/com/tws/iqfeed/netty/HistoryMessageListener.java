@@ -25,12 +25,12 @@ public class HistoryMessageListener implements MessageListener {
         try {
             String msg = ((TextMessage) message).getText();
             if (msg.contains("\\r\\n")) {
-                msg = msg.replaceAll("\\r\\n","");
+                msg = msg.replace("\\r\\n","");
             }
             if(!msg.contains("\r\n")){
                 msg = msg + "\r\n";
             }
-            logger.info("send message: {}.", msg);
+            logger.debug("send message: {}", msg);
             historySocket.send(msg);
         } catch (JMSException e) {
             logger.error("unable to send message.", e);

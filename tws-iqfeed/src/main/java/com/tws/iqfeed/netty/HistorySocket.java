@@ -60,6 +60,7 @@ public class HistorySocket implements InitializingBean {
                                         }
                                         attr.set(getInitCmd());
                                     }
+                                    logger.info("Send command: [{}], channel: {}",elem.replace("\r\n",""), channel.toString());
                                     channel.writeAndFlush(Unpooled.wrappedBuffer(elem.getBytes()));
                                     channelQueue.offer(channel);
                                 }
@@ -84,7 +85,7 @@ public class HistorySocket implements InitializingBean {
                     Channel channel = channelQueue.take();
                     queue.add(channel);
                     if(queue.size() == poolSize){
-                        logger.info("ChannelQueue is full with size [{}], pop first channel back to pool.", poolSize);
+                        logger.debug("ChannelQueue is full with size [{}], pop first channel back to pool.", poolSize);
                         Channel polledChannel = queue.poll();
                         if(polledChannel != null) {
                             pool.release(polledChannel);
