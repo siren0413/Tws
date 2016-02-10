@@ -8,6 +8,8 @@ import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,8 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 @Component
 public class Level1Socket implements InitializingBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(Level1Socket.class);
 
     public static BlockingQueue<String> symbolQueue;
     public static BlockingQueue<String> commandQueue;
@@ -45,6 +49,7 @@ public class Level1Socket implements InitializingBean {
         public void run() {
             while (true) {
                 try {
+                    logger.info("run");
                     String elem = symbolQueue.take();
                     Future<Channel> future = pool.acquire();
                     future.addListener(new GenericFutureListener<Future<? super Channel>>() {

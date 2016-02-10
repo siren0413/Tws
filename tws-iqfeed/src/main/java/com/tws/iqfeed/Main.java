@@ -1,11 +1,10 @@
 package com.tws.iqfeed;
 
-import com.tws.controller.HistorySocketController;
 import com.tws.iqfeed.common.Command;
 import com.tws.iqfeed.netty.HistorySocket;
 import com.tws.iqfeed.socket.SocketConnection;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +18,9 @@ import java.io.IOException;
 
 //
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) throws IOException {
 //        Runtime.getRuntime().exec("IQConnect.exe -product YIJUN_MAO_11967 -version 1.0 ");
 //        SocketConnection connection1 = new SocketConnection("127.0.0.1", 9300);
@@ -49,6 +51,7 @@ public class Main {
 //        socket.send(Command.Level1.SET_PROTOCOL());
 //        socket.send("HTX,AAPL,,,AAPL,\r\n");
 //        socket.send("HTX,FB,,,FB,\r\n");
+        logger.info("*************************");
 
 //        ApplicationContext context = SpringApplication.run(Main.class, args);
     }
