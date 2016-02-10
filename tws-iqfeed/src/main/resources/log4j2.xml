@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration status="debug" monitorInterval="60">
+<configuration status="warn" monitorInterval="60">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p [%t] %c{1}:%L - %msg%n"/>
@@ -30,5 +30,11 @@
             <AppenderRef ref="InfoRollingFile" level="info"/>
             <AppenderRef ref="ErrorRollingFile" level="error"/>
         </Root>
+        <logger name="org.apache.activemq" additivity="false">
+            <appender-ref ref="Console" />
+        </logger>
+        <logger name="org.apache.activemq.spring" additivity="false">
+            <appender-ref ref="Console" />
+        </logger>
     </Loggers>
 </configuration>
