@@ -8,6 +8,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import java.util.Date;
@@ -18,6 +20,9 @@ import java.util.Set;
  */
 @ChannelHandler.Sharable
 public class Level1Handler extends SimpleChannelInboundHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(Level1Handler.class);
+
     private byte[] buffer = new byte[102400];
     private ActivemqPublisher publisher;
     private static final String LEVEL1_TOPIC = "LEVEL1_FEED";
@@ -39,7 +44,7 @@ public class Level1Handler extends SimpleChannelInboundHandler {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("channelInactive " + new Date());
+        logger.error("Channel inactive.");
         Channel channel = ctx.channel();
         Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(Level1Socket.ATTRIBUTE_KEY_SYMBOL));
         Set<String> value = attr.get();
@@ -51,7 +56,7 @@ public class Level1Handler extends SimpleChannelInboundHandler {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("channelActive " + new Date());
+        logger.debug("Channel active.");
         super.channelActive(ctx);
     }
 }

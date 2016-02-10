@@ -10,14 +10,15 @@ import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 /**
- * Created by admin on 2/2/2016.
+ * Created by admin on 2/9/2016.
  */
-public class Level1MessageListener implements MessageListener {
+public class HistoryMessageListener implements MessageListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(Level1MessageListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(HistoryMessageListener.class);
 
     @Autowired
-    private Level1Socket level1Socket;
+    private HistorySocket historySocket;
+
 
     @Override
     public void onMessage(Message message) {
@@ -30,7 +31,7 @@ public class Level1MessageListener implements MessageListener {
                 msg = msg + "\r\n";
             }
             logger.info("send message: {}.", msg);
-            level1Socket.send(msg);
+            historySocket.send(msg);
         } catch (JMSException e) {
             logger.error("unable to send message.", e);
         }

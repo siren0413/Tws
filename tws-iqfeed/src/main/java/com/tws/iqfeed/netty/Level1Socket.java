@@ -30,18 +30,21 @@ public class Level1Socket implements InitializingBean {
 
     public static BlockingQueue<String> symbolQueue;
     public static BlockingQueue<String> commandQueue;
+    public static BlockingQueue<Channel> channelQueue;
     public static final String ATTRIBUTE_KEY_SYMBOL = "SYMBOL_SET";
     public static final String ATTRIBUTE_KEY_INITCMD = "INIT_CMD";
 
     private ChannelPool pool;
     private ExecutorService executor;
     private int numThreads;
+    private int poolSize;
     private String symbolList;
 
 
     private void start() {
         executor.submit(new SymbolQueueWorker());
         executor.submit(new CommandQueueWorker());
+        executor.submit(new ChannelQueueWorker());
     }
 
     class SymbolQueueWorker implements Runnable {
@@ -49,7 +52,6 @@ public class Level1Socket implements InitializingBean {
         public void run() {
             while (true) {
                 try {
-                    logger.info("run");
                     String elem = symbolQueue.take();
                     Future<Channel> future = pool.acquire();
                     future.addListener(new GenericFutureListener<Future<? super Channel>>() {
@@ -67,6 +69,7 @@ public class Level1Socket implements InitializingBean {
                                     }
                                     String msg = String.format("w%s\r\n", elem);
                                     channel.writeAndFlush(Unpooled.wrappedBuffer(msg.getBytes()));
+                                    logger.info("Request feed of symbol [{}] to [{}]", elem, channel.remoteAddress());
                                     Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY_SYMBOL));
                                     Set<String> value = attr.get();
                                     if (value == null) {
@@ -74,7 +77,7 @@ public class Level1Socket implements InitializingBean {
                                         attr.set(value);
                                     }
                                     value.add(elem);
-                                    pool.release(channel);
+                                    channelQueue.offer(channel);
                                 }
                             } else {
                                 symbolQueue.offer(elem);
@@ -82,7 +85,7 @@ public class Level1Socket implements InitializingBean {
                         }
                     });
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("error take element from blocking queue.", e);
                 }
             }
         }
@@ -109,7 +112,32 @@ public class Level1Socket implements InitializingBean {
                         }
                     });
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("error take element from blocking queue.", e);
+                }
+            }
+        }
+    }
+
+    class ChannelQueueWorker implements Runnable{
+
+        private Queue<Channel> queue = new LinkedList<>();
+
+        @Override
+        public void run() {
+            while(true){
+                try {
+                    Channel channel = channelQueue.take();
+                    queue.add(channel);
+                    if(queue.size() == poolSize){
+                        Attribute<Set<String>> attr = channel.attr(AttributeKey.valueOf(ATTRIBUTE_KEY_SYMBOL));
+                        logger.info("ChannelQueue is full with size [{}], pop first channel back to pool. attr size {}", poolSize, attr.get().size());
+                        Channel polledChannel = queue.poll();
+                        if(polledChannel != null) {
+                            pool.release(polledChannel);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    logger.error("error take element from blocking queue.", e);
                 }
             }
         }
@@ -131,8 +159,13 @@ public class Level1Socket implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        logger.info("Level1 socket initialized with following parameters:");
+        logger.info("pool size = {}", poolSize);
+        logger.info("number of executor threads = {}", numThreads);
+        logger.info("symbol list: {}", symbolList);
         symbolQueue = new LinkedBlockingDeque<>();
         commandQueue = new LinkedBlockingDeque<>();
+        channelQueue = new LinkedBlockingDeque<>();
         executor = Executors.newFixedThreadPool(numThreads);
         StringTokenizer tokenizer = new StringTokenizer(symbolList, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -154,5 +187,10 @@ public class Level1Socket implements InitializingBean {
     @Required
     public void setSymbolList(String symbolList) {
         this.symbolList = symbolList;
+    }
+
+    @Required
+    public void setPoolSize(int poolSize) {
+        this.poolSize = poolSize;
     }
 }

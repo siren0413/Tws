@@ -6,6 +6,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
@@ -14,9 +16,11 @@ import org.springframework.beans.factory.annotation.Required;
 @ChannelHandler.Sharable
 public class HistoryHandler extends SimpleChannelInboundHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(HistoryHandler.class);
+
     private byte[] buffer = new byte[81960];
     private ActivemqPublisher publisher;
-    private final static String HISTORY_CHANNEL = "HISTORY_TOPIC";
+    private final static String HISTORY_CHANNEL = "HISTORY_DATA";
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -24,7 +28,11 @@ public class HistoryHandler extends SimpleChannelInboundHandler {
         if (in.isReadable()) {
             int len = in.readableBytes();
             in.getBytes(0, buffer, 0, len);
-            publisher.publish(HISTORY_CHANNEL, new String(buffer, 0, len));
+            String message = new String(buffer, 0, len);
+            if(message.trim().startsWith("E")){
+                logger.error("received error message: " + message);
+            }
+            publisher.publish(HISTORY_CHANNEL, message);
         }
     }
 

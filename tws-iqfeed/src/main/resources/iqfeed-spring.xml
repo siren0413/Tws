@@ -11,7 +11,7 @@
     <bean id="level1Pool" class="com.tws.iqfeed.netty.ConnectionPool">
         <property name="host" value="127.0.0.1"/>
         <property name="port" value="5009"/>
-        <property name="poolSize" value="1"/>
+        <property name="poolSize" value="2"/>
         <property name="fixed" value="true"/>
         <property name="handler">
             <bean class="com.tws.iqfeed.netty.Level1Handler">
@@ -24,15 +24,16 @@
 
     <bean id="level1Socket" class="com.tws.iqfeed.netty.Level1Socket">
         <property name="pool" ref="level1Pool"/>
-        <property name="numThreads" value="2"/>
+        <property name="numThreads" value="3"/>
+        <property name="poolSize" value="2"/>
         <property name="symbolList" value="${symbol.list}"/>
     </bean>
 
     <bean id="historyPool" class="com.tws.iqfeed.netty.ConnectionPool">
         <property name="host" value="127.0.0.1"/>
         <property name="port" value="9100"/>
-        <!--<property name="poolSize" value="1"/>-->
-        <property name="fixed" value="false"/>
+        <property name="poolSize" value="2"/>
+        <property name="fixed" value="true"/>
         <property name="handler">
             <bean class="com.tws.iqfeed.netty.HistoryHandler">
                 <property name="publisher">
@@ -45,6 +46,7 @@
     <bean id="historySocket" class="com.tws.iqfeed.netty.HistorySocket">
         <property name="pool" ref="historyPool"/>
         <property name="numThreads" value="2"/>
+        <property name="poolSize" value="2"/>
     </bean>
 
 
@@ -56,6 +58,17 @@
         <property name="destinationName" value="LEVEL1_LISTEN"/>
         <property name="messageListener">
             <bean class="com.tws.iqfeed.netty.Level1MessageListener"/>
+        </property>
+    </bean>
+
+    <bean id="historyListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="autoStartup" value="true"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="sessionTransacted" value="false"/>
+        <property name="destinationName" value="HISTORY_LISTEN"/>
+        <property name="messageListener">
+            <bean class="com.tws.iqfeed.netty.HistoryMessageListener"/>
         </property>
     </bean>
 

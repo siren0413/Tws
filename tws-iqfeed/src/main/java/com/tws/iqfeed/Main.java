@@ -51,6 +51,7 @@ public class Main {
 //        socket.send(Command.Level1.SET_PROTOCOL());
 //        socket.send("HTX,AAPL,,,AAPL,\r\n");
 //        socket.send("HTX,FB,,,FB,\r\n");
+//        socket.send("HTX,GOOG,,,GOOG,\r\n");
         logger.info("*************************");
 
 //        ApplicationContext context = SpringApplication.run(Main.class, args);

@@ -8,13 +8,12 @@ import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,17 +23,21 @@ import java.util.concurrent.LinkedBlockingDeque;
  * Created by admin on 1/31/2016.
  */
 public class HistorySocket implements InitializingBean {
-    public static BlockingQueue<String> queue;
+
+    private static final Logger logger = LoggerFactory.getLogger(HistorySocket.class);
+
+    public static BlockingQueue<String> commandQueue;
+    public static BlockingQueue<Channel> channelQueue;
     public static final String ATTRIBUTE_KEY = "HISTORY_CMD";
 
     private ChannelPool pool;
     private ExecutorService executor;
     private int numThreads;
+    private int poolSize;
 
     private void start() {
-        for (int i = 0; i < numThreads; i++) {
-            executor.submit(new QueueWorker());
-        }
+        executor.submit(new QueueWorker());
+        executor.submit(new ChannelQueueWorker());
     }
 
     class QueueWorker implements Runnable {
@@ -42,7 +45,7 @@ public class HistorySocket implements InitializingBean {
         public void run() {
             while (true) {
                 try {
-                    String elem = queue.take();
+                    String elem = commandQueue.take();
                     Future<Channel> future = pool.acquire();
                     future.addListener(new GenericFutureListener<Future<? super Channel>>() {
                         @Override
@@ -58,20 +61,44 @@ public class HistorySocket implements InitializingBean {
                                         attr.set(getInitCmd());
                                     }
                                     channel.writeAndFlush(Unpooled.wrappedBuffer(elem.getBytes()));
-                                    pool.release(channel);
+                                    channelQueue.offer(channel);
                                 }
                             }
                         }
                     });
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.error("error take element from blocking queue.", e);
+                }
+            }
+        }
+    }
+
+    class ChannelQueueWorker implements Runnable{
+
+        private Queue<Channel> queue = new LinkedList<>();
+
+        @Override
+        public void run() {
+            while(true){
+                try {
+                    Channel channel = channelQueue.take();
+                    queue.add(channel);
+                    if(queue.size() == poolSize){
+                        logger.info("ChannelQueue is full with size [{}], pop first channel back to pool.", poolSize);
+                        Channel polledChannel = queue.poll();
+                        if(polledChannel != null) {
+                            pool.release(polledChannel);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    logger.error("error take element from blocking queue.", e);
                 }
             }
         }
     }
 
     public void send(String cmd) {
-        queue.offer(cmd);
+        commandQueue.offer(cmd);
     }
 
     private List<String> getInitCmd() {
@@ -82,7 +109,11 @@ public class HistorySocket implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        queue = new LinkedBlockingDeque<>();
+        logger.info("History socket initialized with following parameters:");
+        logger.info("pool size = {}", poolSize);
+        logger.info("number of executor threads = {}", numThreads);
+        channelQueue = new LinkedBlockingDeque<>();
+        commandQueue = new LinkedBlockingDeque<>();
         executor = Executors.newFixedThreadPool(numThreads);
         start();
     }
@@ -97,4 +128,8 @@ public class HistorySocket implements InitializingBean {
         this.pool = pool;
     }
 
+    @Required
+    public void setPoolSize(int poolSize) {
+        this.poolSize = poolSize;
+    }
 }
