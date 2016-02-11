@@ -25,33 +25,33 @@ public class Main {
 //        Runtime.getRuntime().exec("IQConnect.exe -product YIJUN_MAO_11967 -version 1.0 ");
 //        SocketConnection connection1 = new SocketConnection("127.0.0.1", 9300);
 //        connection1.connect(true);
-//        connection1.send("S,CONNECT\r\n");
-//        connection1.send("S,CONNECT\r\n");
-//        connection1.send("S,CONNECT\r\n");
+//        connection1.publish("S,CONNECT\r\n");
+//        connection1.publish("S,CONNECT\r\n");
+//        connection1.publish("S,CONNECT\r\n");
 
 //        String sCommand = String.format("HTX,%s,%s,%s,%s,%s\r\n", "AAPL", "", "", "", "");
-//        connection1.send(sCommand);
+//        connection1.publish(sCommand);
 //
 //        SocketConnection connection2 = new SocketConnection("127.0.0.1", 9100);
 //        connection2.connect(true);
 //        String sCommand2 = String.format("HTX,%s,%s,%s,%s,%s\r\n", "FB", "", "", "", "");
-//        connection2.send(sCommand2);
+//        connection2.publish(sCommand2);
 //
 //        Connection connection2 = new SocketConnection("127.0.0.1", 9300);
 //        connection2.connect();
-//        connection2.send("S,CONNECT\r\n");
+//        connection2.publish("S,CONNECT\r\n");
 //
 //        Connection connection3 = new SocketConnection("127.0.0.1", 9300);
 //        connection3.connect();
-//        connection3.send("S,CONNECT\r\n");
+//        connection3.publish("S,CONNECT\r\n");
 //        SpringApplication.run(Main.class, args);
         ApplicationContext ctx = new ClassPathXmlApplicationContext("iqfeed-spring.xml");
         ctx.getBean("level1Socket");
         HistorySocket socket = (HistorySocket) ctx.getBean("historySocket");
-//        socket.send(Command.Level1.SET_PROTOCOL());
-//        socket.send("HTX,AAPL,,,AAPL,\r\n");
-//        socket.send("HTX,FB,,,FB,\r\n");
-//        socket.send("HTX,GOOG,,,GOOG,\r\n");
+//        socket.publish(Command.Level1.SET_PROTOCOL());
+//        socket.publish("HTX,AAPL,,,AAPL,\r\n");
+//        socket.publish("HTX,FB,,,FB,\r\n");
+//        socket.publish("HTX,GOOG,,,GOOG,\r\n");
         logger.info("*************************");
 
 //        ApplicationContext context = SpringApplication.run(Main.class, args);

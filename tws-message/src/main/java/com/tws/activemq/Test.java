@@ -18,7 +18,7 @@ public class Test {
 //        Destination destination = session.createTopic("Tick");
 //        TextMessage message = session.createTextMessage("fasdfjlaskdf");
 //        MessageProducer producer = session.createProducer(destination);
-//        producer.send(message);
+//        producer.publish(message);
 
         ApplicationContext ctx = new ClassPathXmlApplicationContext("message-spring.xml");
         ActivemqPublisher publisher = (ActivemqPublisher) ctx.getBean("publisher");

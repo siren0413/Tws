@@ -20,10 +20,8 @@ public class ZeromqSubscriber implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        executor = Executors.newFixedThreadPool(2);
-        for(int i =0; i < 2; i++) {
-            executor.submit(new Worker());
-        }
+        executor = Executors.newFixedThreadPool(1);
+        executor.submit(new Worker());
     }
 
     class Worker implements Runnable {
@@ -31,7 +29,7 @@ public class ZeromqSubscriber implements InitializingBean {
         private ZMQ.Socket subscriber;
 
         public Worker() {
-            ZMQ.Context context = ZMQ.context(1);
+            ZMQ.Context context = ZMQ.context(5);
             subscriber = context.socket(ZMQ.SUB);
             subscriber.connect("tcp://" + host + ":5678");
             subscriber.subscribe(channel.getBytes());
@@ -41,7 +39,7 @@ public class ZeromqSubscriber implements InitializingBean {
         public void run() {
             while (true) {
                 String msg = subscriber.recvStr();
-                String value = msg.split(" ")[1];
+                String value = msg.substring(msg.indexOf(" ")+1);
                 messageListener.onMessageReceived(value);
             }
         }

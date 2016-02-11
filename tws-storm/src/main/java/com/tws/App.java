@@ -9,9 +9,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
+    public static void main( String[] args )  {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("storm-spring.xml");
-        ctx.getBean("historyListenerContainer");
+        ctx.getBean("historyMessageDecoder");
     }
 }

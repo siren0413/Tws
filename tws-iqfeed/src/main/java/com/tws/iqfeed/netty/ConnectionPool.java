@@ -25,14 +25,14 @@ public class ConnectionPool implements FactoryBean<ChannelPool> {
 
     @Override
     public ChannelPool getObject() throws Exception {
-        EventLoopGroup eventLoop = new NioEventLoopGroup();
+        EventLoopGroup eventLoop = new NioEventLoopGroup(5);
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(eventLoop);
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.option(ChannelOption.TCP_NODELAY, true);
         bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
         bootstrap.remoteAddress(host, port);
-        bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(204800));
+        bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(819600));
 
         if(fixed) {
             FixedChannelPool fixedChannelPool = new FixedChannelPool(bootstrap, new AbstractChannelPoolHandler() {

@@ -29,10 +29,10 @@ public class Level1MessageListener implements MessageListener {
             if(!msg.contains("\r\n")){
                 msg = msg + "\r\n";
             }
-            logger.debug("send message: {}", msg);
+            logger.debug("publish message: {}", msg);
             level1Socket.send(msg);
         } catch (JMSException e) {
-            logger.error("unable to send message.", e);
+            logger.error("unable to publish message.", e);
         }
     }
 }

@@ -15,7 +15,7 @@ public class ZeromqTest {
 //        ZeromqSubscriber subscriber = (ZeromqSubscriber) context.getBean("subscriber");
 //        for(int i = 0 ; i < 100000; i++) {
 //            Thread.sleep(100);
-//            publisher.send("haha", "nihao");
+//            publisher.publish("haha", "nihao");
 //        }
 
 

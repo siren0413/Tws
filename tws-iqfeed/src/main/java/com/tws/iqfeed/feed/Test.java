@@ -18,7 +18,7 @@ public class Test {
         KafkaConsumer consumer = (KafkaConsumer) ctx.getBean("historyCmdConsumer");
         consumer.consume("historyCmd");
 
-//        historyFeed.send("HTX,AAPL,,,,\r\n");
+//        historyFeed.publish("HTX,AAPL,,,,\r\n");
         while (true) {
             try {
                 Thread.sleep(1000);

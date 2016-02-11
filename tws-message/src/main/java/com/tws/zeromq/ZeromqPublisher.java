@@ -24,13 +24,17 @@ public class ZeromqPublisher implements InitializingBean {
         ZMQ.Context context = ZMQ.context(1);
         publisher = context.socket(ZMQ.PUB);
         publisher.bind("tcp://*:5678");
-        executor = Executors.newFixedThreadPool(1);
+        executor = Executors.newFixedThreadPool(5);
         queue = new LinkedBlockingDeque<>();
-        executor.submit(new Worker());
+        for(int i = 0; i < 5; i++) {
+            executor.submit(new Worker());
+        }
     }
 
-    public void send(String channel, String msg) {
-        queue.offer(new Tuple(channel, msg));
+    public void publish(String channel, String msg) {
+        String message = channel + " " + msg;
+        publisher.send(message, ZMQ.NOBLOCK);
+//        queue.offer(new Tuple(channel, msg));
     }
 
     class Worker implements Runnable {

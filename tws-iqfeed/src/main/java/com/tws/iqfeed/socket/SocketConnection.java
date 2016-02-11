@@ -53,7 +53,7 @@ public class SocketConnection implements Connection {
 
     public void send(String message) {
         if (channelFuture == null) {
-            logger.error("Failed to send message due to channelFuture not initialized.");
+            logger.error("Failed to publish message due to channelFuture not initialized.");
         } else {
             Channel channel = channelFuture.awaitUninterruptibly().channel();
             channel.writeAndFlush(Unpooled.wrappedBuffer(message.getBytes()));

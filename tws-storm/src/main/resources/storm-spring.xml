@@ -9,17 +9,27 @@
     <import resource="classpath:shared-spring.xml"/>
     <import resource="classpath:message-spring.xml"/>
 
-    <bean id="historyListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="autoStartup" value="true"/>
-        <property name="pubSubDomain" value="true"/>
-        <property name="sessionTransacted" value="false"/>
-        <property name="destinationName" value="HISTORY_DATA"/>
-        <property name="messageListener">
-            <bean class="com.tws.storm.HistoryMessageListener"/>
-        </property>
-    </bean>
+    <!--<bean id="historyListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="jmsConnectionFactory"/>-->
+        <!--<property name="autoStartup" value="true"/>-->
+        <!--<property name="pubSubDomain" value="true"/>-->
+        <!--<property name="sessionTransacted" value="false"/>-->
+        <!--<property name="destinationName" value="HISTORY_DATA"/>-->
+        <!--<property name="messageListener">-->
+            <!--<bean class="com.tws.storm.HistoryMessageListener"/>-->
+        <!--</property>-->
+    <!--</bean>-->
 
     <bean id="historyMessageDecoder" class="com.tws.shared.iqfeed.decoder.HistoryTickMessageDecoder"/>
+
+    <bean id="subscriber" class="com.tws.zeromq.ZeromqSubscriber">
+        <property name="channel" value="HISTORY_DATA"/>
+        <property name="host" value="127.0.0.1"/>
+        <property name="messageListener">
+            <bean class="com.tws.storm.HistoryMessageListener">
+                <property name="historyTickMessageDecoder" ref="historyMessageDecoder"/>
+            </bean>
+        </property>
+    </bean>
 
 </beans>
