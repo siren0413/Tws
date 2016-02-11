@@ -1,7 +1,7 @@
 package com.tws.cassandra.dao;
 
 import com.datastax.driver.core.Session;
-import com.tws.shared.model.Tick;
+import com.tws.shared.ib.model.Tick;
 
 /**
  * Created by yijunmao on 1/17/16.

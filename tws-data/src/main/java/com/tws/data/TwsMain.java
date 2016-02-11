@@ -1,6 +1,6 @@
 package com.tws.data;
 
-import com.tws.shared.Symbol;
+import com.tws.shared.ib.Symbol;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.LinkedList;

@@ -1,6 +1,4 @@
-package com.tws.shared;
-
-import com.ib.client.Types;
+package com.tws.shared.ib;
 
 /**
  * Created by chris on 1/18/16.

@@ -1,4 +1,4 @@
-package com.tws.shared.marshall;
+package com.tws.shared;
 
 /**
  * Created by chris on 1/18/16.

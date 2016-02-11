@@ -2,9 +2,9 @@ package com.tws.data;
 
 import com.ib.client.*;
 import com.tws.activemq.TwsMessageSender;
-import com.tws.shared.MsgType;
-import com.tws.shared.marshall.TickerMarshaller;
-import com.tws.shared.model.Tick;
+import com.tws.shared.ib.MsgType;
+import com.tws.shared.ib.marshall.TickerMarshaller;
+import com.tws.shared.ib.model.Tick;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

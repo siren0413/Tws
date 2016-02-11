@@ -1,7 +1,7 @@
 package com.tws.cassandra.repository;
 
 import com.tws.cassandra.dao.TickDAO;
-import com.tws.shared.model.Tick;
+import com.tws.shared.ib.model.Tick;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -1,8 +1,8 @@
 package com.tws.data;
 
 import com.ib.client.TickType;
-import com.tws.shared.Symbol;
-import com.tws.shared.model.Tick;
+import com.tws.shared.ib.Symbol;
+import com.tws.shared.ib.model.Tick;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

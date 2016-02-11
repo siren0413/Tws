@@ -1,7 +1,7 @@
-package com.tws.shared;
+package com.tws.shared.ib;
 
 import com.ib.client.Types;
-import com.tws.shared.model.Currency;
+import com.tws.shared.ib.model.Currency;
 
 /**
  * Created by chris on 1/18/16.

@@ -1,4 +1,4 @@
-package com.tws.shared.model;
+package com.tws.shared.ib.model;
 
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;

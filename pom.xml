@@ -12,7 +12,6 @@
 
     <modules>
         <module>tws-api</module>
-        <module>tws-activemq</module>
         <module>tws-db</module>
         <module>tws-data</module>
         <module>tws-repository</module>

@@ -1,6 +1,6 @@
-package com.tws.shared;
+package com.tws.shared.ib;
 
-import com.tws.shared.marshall.TickerMarshaller;
+import com.tws.shared.ib.marshall.TickerMarshaller;
 
 /**
  * Created by chris on 1/18/16.

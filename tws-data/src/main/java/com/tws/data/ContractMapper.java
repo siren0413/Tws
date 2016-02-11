@@ -1,7 +1,7 @@
 package com.tws.data;
 
 import com.ib.client.Contract;
-import com.tws.shared.Symbol;
+import com.tws.shared.ib.Symbol;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.HashMap;

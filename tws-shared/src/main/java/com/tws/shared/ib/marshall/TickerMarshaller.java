@@ -1,7 +1,8 @@
-package com.tws.shared.marshall;
+package com.tws.shared.ib.marshall;
 
-import com.tws.shared.MsgType;
-import com.tws.shared.model.Tick;
+import com.tws.shared.Marshaller;
+import com.tws.shared.ib.MsgType;
+import com.tws.shared.ib.model.Tick;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

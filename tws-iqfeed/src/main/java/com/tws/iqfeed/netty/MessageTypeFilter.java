@@ -5,24 +5,32 @@ package com.tws.iqfeed.netty;
  */
 public class MessageTypeFilter {
 
-     enum TYPE{
+    enum TYPE {
         ERROR,
         SYMBOL_NOT_FOUND,
         NORMAL;
     }
 
-    public static TYPE filterHistoryMsg(String msg){
-        if(msg.startsWith("E,") || msg.contains(",E,")){
+    public static TYPE filterHistoryMsg(String msg) {
+        String[] parts = msg.split(",");
+        if (parts.length > 0 && parts[0].equals("E")) {
+            return TYPE.ERROR;
+        }
+        if (parts.length > 1 && parts[1].equals("E")) {
             return TYPE.ERROR;
         }
         return TYPE.NORMAL;
     }
 
-    public static TYPE filterLevel1Msg(String msg){
-        if(msg.startsWith("E,") || msg.contains(",E,")){
+    public static TYPE filterLevel1Msg(String msg) {
+        String[] parts = msg.split(",");
+        if (parts.length > 0 && parts[0].equals("E")) {
             return TYPE.ERROR;
         }
-        if(msg.startsWith("n,")){
+        if (parts.length > 1 && parts[1].equals("E")) {
+            return TYPE.ERROR;
+        }
+        if (parts.length > 0 && parts[0].equals("n")) {
             return TYPE.SYMBOL_NOT_FOUND;
         }
         return TYPE.NORMAL;

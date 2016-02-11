@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration status="warn" monitorInterval="60">
+<configuration status="info" monitorInterval="60">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p %-25.25t %c{1}:%L - %msg%n"/>
         </Console>
-        <RollingFile name="InfoRollingFile" fileName="logs/info.log" filePattern="logs/$${date:yyyyMM}/info-%d{yyyy-MM-dd-HH}.%i.log" >
+        <RollingFile name="InfoRollingFile" fileName="logs/info.log" filePattern="logs/$${date:yyyyMM}/info-%d{yyyy-MM-dd-HH}.%i.log" immediateFlush="true">
             <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p [%t] %c{1}:%L - %msg%n"/>
             <Policies>
-                <OnStartupTriggeringPolicy />
                 <TimeBasedTriggeringPolicy />
+                <OnStartupTriggeringPolicy />
                 <SizeBasedTriggeringPolicy size="250 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="100"/>
         </RollingFile>
-        <RollingFile name="ErrorRollingFile" fileName="logs/alert.log" filePattern="logs/$${date:yyyyMM}/alert-%d{yyyy-MM-dd-HH}.%i.log" >
+        <RollingFile name="ErrorRollingFile" fileName="logs/alert.log" filePattern="logs/$${date:yyyyMM}/alert-%d{yyyy-MM-dd-HH}.%i.log" immediateFlush="true">
             <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p [%t] %c{1}:%L - %msg%n"/>
             <Policies>
-                <OnStartupTriggeringPolicy />
                 <TimeBasedTriggeringPolicy />
+                <OnStartupTriggeringPolicy  />
                 <SizeBasedTriggeringPolicy size="250 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="100"/>
@@ -30,11 +30,5 @@
             <AppenderRef ref="InfoRollingFile" level="info"/>
             <AppenderRef ref="ErrorRollingFile" level="error"/>
         </Root>
-        <logger name="org.apache.activemq" additivity="false">
-            <appender-ref ref="Console" />
-        </logger>
-        <logger name="org.apache.activemq.spring" additivity="false">
-            <appender-ref ref="Console" />
-        </logger>
     </Loggers>
 </configuration>

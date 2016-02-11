@@ -2,7 +2,7 @@ package com.tws.data;
 
 import com.ib.client.Contract;
 import com.ib.client.EClientSocket;
-import com.tws.shared.Symbol;
+import com.tws.shared.ib.Symbol;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
