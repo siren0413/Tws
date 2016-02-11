@@ -5,7 +5,10 @@
     <groupId>com.chris.tws</groupId>
     <artifactId>tws-data</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>../tws-storm</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>tws-data</name>
     <url>http://maven.apache.org</url>

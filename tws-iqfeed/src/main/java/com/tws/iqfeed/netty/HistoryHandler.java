@@ -1,5 +1,6 @@
 package com.tws.iqfeed.netty;
 
+import com.google.common.base.Splitter;
 import com.tws.activemq.ActivemqPublisher;
 import com.tws.zeromq.ZeromqPublisher;
 import io.netty.buffer.ByteBuf;
@@ -9,6 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -23,22 +25,23 @@ public class HistoryHandler extends SimpleChannelInboundHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryHandler.class);
 
-    private byte[] buffer = new byte[81960];
     private ActivemqPublisher publisher;
     private final static String HISTORY_CHANNEL = "HISTORY_DATA";
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf in = (ByteBuf) msg;
-        if (in.isReadable()) {
-            int len = in.readableBytes();
-            in.getBytes(0, buffer, 0, len);
-            String message = new String(buffer, 0, len).trim();
-            MessageTypeFilter.TYPE type = MessageTypeFilter.filterHistoryMsg(message);
-            if(type == MessageTypeFilter.TYPE.ERROR){
-                logger.error("received error message: " + message);
-            }
-            publisher.publish(HISTORY_CHANNEL, message);
+        ByteBuf buf = (ByteBuf) msg;
+        String message = buf.toString(CharsetUtil.US_ASCII);
+
+        MessageTypeFilter.TYPE type = MessageTypeFilter.filterHistoryMsg(message);
+        if (type == MessageTypeFilter.TYPE.ERROR) {
+            logger.error("received error message: " + message);
+            return;
+        }
+
+        Splitter splitter = Splitter.on(System.getProperty("line.separator")).trimResults().omitEmptyStrings();
+        for (String line : splitter.split(message)) {
+            publisher.publish(HISTORY_CHANNEL, line);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.tws.iqfeed.netty;
 
+import com.google.common.base.Splitter;
 import com.tws.activemq.ActivemqPublisher;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -8,6 +9,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -23,7 +25,6 @@ public class Level1Handler extends SimpleChannelInboundHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(Level1Handler.class);
 
-    private byte[] buffer = new byte[102400];
     private ActivemqPublisher publisher;
     private static final String LEVEL1_TOPIC = "LEVEL1_FEED";
 
@@ -34,21 +35,22 @@ public class Level1Handler extends SimpleChannelInboundHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf in = (ByteBuf) msg;
-        if (in.isReadable()) {
-            int len = in.readableBytes();
-            in.getBytes(0, buffer, 0, len);
-            String message = new String(buffer, 0, len).trim();
-            MessageTypeFilter.TYPE type = MessageTypeFilter.filterLevel1Msg(message);
-            switch (type){
-                case ERROR:
-                    logger.error("received error message: " + message);
-                    break;
-                case SYMBOL_NOT_FOUND:
-                    logger.error("symbol not found: " + message);
-                    break;
-            }
-            publisher.publish(LEVEL1_TOPIC, message);
+        ByteBuf buf = (ByteBuf) msg;
+        String message = buf.toString(CharsetUtil.US_ASCII);
+
+        MessageTypeFilter.TYPE type = MessageTypeFilter.filterLevel1Msg(message);
+        switch (type) {
+            case ERROR:
+                logger.error("received error message: " + message);
+                return;
+            case SYMBOL_NOT_FOUND:
+                logger.error("symbol not found: " + message);
+                return;
+        }
+
+        Splitter splitter = Splitter.on(System.getProperty("line.separator")).trimResults().omitEmptyStrings();
+        for (String line : splitter.split(message)) {
+            publisher.publish(LEVEL1_TOPIC, line);
         }
     }
 
