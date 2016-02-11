@@ -24,7 +24,7 @@ public class ZeromqPublisher implements InitializingBean {
         ZMQ.Context context = ZMQ.context(1);
         publisher = context.socket(ZMQ.PUB);
         publisher.bind("tcp://*:5678");
-        executor = Executors.newFixedThreadPool(5);
+        executor = Executors.newFixedThreadPool(1);
         queue = new LinkedBlockingDeque<>();
         executor.submit(new Worker());
     }
@@ -36,11 +36,11 @@ public class ZeromqPublisher implements InitializingBean {
     class Worker implements Runnable {
         @Override
         public void run() {
-            while(true) {
+            while (true) {
                 try {
                     Tuple tuple = queue.take();
                     String message = tuple.getA() + " " + tuple.getB();
-                    publisher.send(message.getBytes("US-ASCII"),ZMQ.NOBLOCK);
+                    publisher.send(message.getBytes("US-ASCII"), ZMQ.NOBLOCK);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (UnsupportedEncodingException e) {

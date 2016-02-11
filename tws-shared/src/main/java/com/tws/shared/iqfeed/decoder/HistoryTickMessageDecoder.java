@@ -4,18 +4,17 @@ import com.google.common.base.Splitter;
 import com.tws.shared.iqfeed.model.HistoryTick;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Created by admin on 2/10/2016.
  */
-@Component
 public class HistoryTickMessageDecoder<T> implements MessageDecoder<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryTickMessageDecoder.class);
 
+    @Override
     public T decode(String msg) {
         Splitter splitter = Splitter.on(",").trimResults().omitEmptyStrings();
         List<String> list = splitter.splitToList(msg);

@@ -72,7 +72,7 @@
         <!--<property name="defaultProperties" ref="defaultProperties"/>-->
     <!--</bean>-->
 
-    <!--<bean id="publisher" class="com.tws.zeromq.ZeromqPublisher"/>-->
+    <bean id="publisher" class="com.tws.zeromq.ZeromqPublisher"/>
 
     <!--<bean id="subscriber" class="com.tws.zeromq.ZeromqSubscriber">-->
         <!--<property name="channel" value="HISTORY_CHANNEL"/>-->

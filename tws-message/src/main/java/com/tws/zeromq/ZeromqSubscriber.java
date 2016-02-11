@@ -40,8 +40,9 @@ public class ZeromqSubscriber implements InitializingBean {
         @Override
         public void run() {
             while (true) {
-                byte[] b = subscriber.recv();
-                messageListener.onMessageReceived(new String(b));
+                String msg = subscriber.recvStr();
+                String value = msg.split(" ")[1];
+                messageListener.onMessageReceived(value);
             }
         }
     }
