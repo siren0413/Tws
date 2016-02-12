@@ -23,8 +23,10 @@
     <bean id="historyMessageDecoder" class="com.tws.shared.iqfeed.decoder.HistoryTickMessageDecoder"/>
 
     <bean id="subscriber" class="com.tws.zeromq.ZeromqSubscriber">
-        <property name="channel" value="HISTORY_DATA"/>
-        <property name="host" value="127.0.0.1"/>
+        <property name="topic" value="HISTORY_DATA"/>
+        <property name="url" value="tcp://127.0.0.1:5799"/>
+        <property name="numIOThreads" value="5"/>
+        <property name="poolSize" value="5"/>
         <property name="messageListener">
             <bean class="com.tws.storm.HistoryMessageListener">
                 <property name="historyTickMessageDecoder" ref="historyMessageDecoder"/>

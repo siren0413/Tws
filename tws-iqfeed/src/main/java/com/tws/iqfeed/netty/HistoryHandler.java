@@ -24,10 +24,21 @@ public class HistoryHandler extends SimpleChannelInboundHandler {
     private ZeromqPublisher publisher;
     private final static String HISTORY_CHANNEL = "HISTORY_DATA";
 
+    private String last = "";
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
-        String message = buf.toString(CharsetUtil.US_ASCII);
+        String message = last + buf.toString(CharsetUtil.US_ASCII).trim();
+        last = "";
+
+        if (!message.endsWith("\r\n")) {
+            int i = message.lastIndexOf("\r\n");
+            if (i != -1) {
+                last = message.substring(i + 2);
+                message = message.substring(0, i);
+            }
+        }
 
         MessageTypeFilter.TYPE type = MessageTypeFilter.filterHistoryMsg(message);
         if (type == MessageTypeFilter.TYPE.ERROR) {
@@ -35,7 +46,7 @@ public class HistoryHandler extends SimpleChannelInboundHandler {
             return;
         }
 
-        Splitter splitter = Splitter.on(System.getProperty("line.separator")).trimResults().omitEmptyStrings();
+        Splitter splitter = Splitter.on("\r\n").trimResults().omitEmptyStrings();
         for (String line : splitter.split(message)) {
             publisher.publish(HISTORY_CHANNEL, line);
         }

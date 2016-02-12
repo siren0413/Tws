@@ -36,7 +36,7 @@ public class Level1Handler extends SimpleChannelInboundHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf buf = (ByteBuf) msg;
-        String message = buf.toString(CharsetUtil.US_ASCII);
+        String message = buf.toString(CharsetUtil.US_ASCII).trim();
 
         MessageTypeFilter.TYPE type = MessageTypeFilter.filterLevel1Msg(message);
         switch (type) {

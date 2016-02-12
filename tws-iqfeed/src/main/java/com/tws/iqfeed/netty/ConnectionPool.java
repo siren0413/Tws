@@ -32,7 +32,7 @@ public class ConnectionPool implements FactoryBean<ChannelPool> {
         bootstrap.option(ChannelOption.TCP_NODELAY, true);
         bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
         bootstrap.remoteAddress(host, port);
-        bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(819600));
+        bootstrap.option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(2048));
 
         if(fixed) {
             FixedChannelPool fixedChannelPool = new FixedChannelPool(bootstrap, new AbstractChannelPoolHandler() {

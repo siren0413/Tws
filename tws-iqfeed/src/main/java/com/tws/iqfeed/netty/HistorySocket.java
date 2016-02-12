@@ -115,7 +115,7 @@ public class HistorySocket implements InitializingBean {
         logger.info("number of executor threads = {}", numThreads);
         channelQueue = new LinkedBlockingDeque<>();
         commandQueue = new LinkedBlockingDeque<>();
-        executor = Executors.newFixedThreadPool(numThreads);
+        executor = Executors.newFixedThreadPool(2);
         start();
     }
 

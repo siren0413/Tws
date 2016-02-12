@@ -1,6 +1,7 @@
 package com.tws.zeromq;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 import org.zeromq.ZMQ;
 
 import java.io.UnsupportedEncodingException;
@@ -14,43 +15,27 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class ZeromqPublisher implements InitializingBean {
 
-    private ExecutorService executor;
     private ZMQ.Socket publisher;
-    private BlockingQueue<Tuple> queue;
+    private int port = 5799;
+    private int numIOThreads = 1;
 
+    public void publish(String channel, String msg) {
+        publisher.send(channel + " " + msg, ZMQ.NOBLOCK);
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        ZMQ.Context context = ZMQ.context(1);
-        publisher = context.socket(ZMQ.PUB);
-        publisher.bind("tcp://*:5678");
-        executor = Executors.newFixedThreadPool(5);
-        queue = new LinkedBlockingDeque<>();
-        for(int i = 0; i < 5; i++) {
-            executor.submit(new Worker());
-        }
+        ZMQ.Context context = ZMQ.context(numIOThreads);
+        this.publisher = context.socket(ZMQ.PUB);
+        this.publisher.bind("tcp://*:" + port);
     }
 
-    public void publish(String channel, String msg) {
-        String message = channel + " " + msg;
-        publisher.send(message, ZMQ.NOBLOCK);
-//        queue.offer(new Tuple(channel, msg));
+    @Required
+    public void setPort(int port) {
+        this.port = port;
     }
 
-    class Worker implements Runnable {
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    Tuple tuple = queue.take();
-                    String message = tuple.getA() + " " + tuple.getB();
-                    publisher.send(message.getBytes("US-ASCII"), ZMQ.NOBLOCK);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    public void setNumIOThreads(int numIOThreads) {
+        this.numIOThreads = numIOThreads;
     }
 }

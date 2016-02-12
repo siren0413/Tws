@@ -32,7 +32,7 @@
     <bean id="historyPool" class="com.tws.iqfeed.netty.ConnectionPool">
         <property name="host" value="127.0.0.1"/>
         <property name="port" value="9100"/>
-        <property name="poolSize" value="1"/>
+        <property name="poolSize" value="3"/>
         <property name="fixed" value="true"/>
         <property name="handler">
             <bean class="com.tws.iqfeed.netty.HistoryHandler">
@@ -43,8 +43,8 @@
 
     <bean id="historySocket" class="com.tws.iqfeed.netty.HistorySocket">
         <property name="pool" ref="historyPool"/>
-        <property name="numThreads" value="1"/>
-        <property name="poolSize" value="1"/>
+        <property name="numThreads" value="3"/>
+        <property name="poolSize" value="3"/>
     </bean>
 
 
@@ -70,6 +70,9 @@
         </property>
     </bean>
 
-    <bean id="publisher" class="com.tws.zeromq.ZeromqPublisher"/>
+    <bean id="publisher" class="com.tws.zeromq.ZeromqPublisher">
+        <property name="port" value="5799"/>
+        <property name="numIOThreads" value="5"/>
+    </bean>
 
 </beans>

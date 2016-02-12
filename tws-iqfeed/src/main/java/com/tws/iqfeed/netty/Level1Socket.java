@@ -167,7 +167,7 @@ public class Level1Socket implements InitializingBean {
         symbolQueue = new LinkedBlockingDeque<>();
         commandQueue = new LinkedBlockingDeque<>();
         channelQueue = new LinkedBlockingDeque<>();
-        executor = Executors.newFixedThreadPool(numThreads);
+        executor = Executors.newFixedThreadPool(3);
         StringTokenizer tokenizer = new StringTokenizer(symbolList, ",");
         while (tokenizer.hasMoreTokens()) {
             symbolQueue.add(tokenizer.nextToken());
