@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.tws.iqfeed.common.Constants.*;
+import static com.tws.shared.Constants.*;
 
 import java.util.List;
 

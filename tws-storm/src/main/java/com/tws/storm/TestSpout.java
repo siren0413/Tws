@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.tws.shared.iqfeed.model.HistoryInterval;
+import com.tws.storm.listener.HistoryIntervalListener;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class TestSpout extends BaseRichSpout {
 
     public void nextTuple() {
         try {
-            HistoryInterval historyInterval = HistoryMessageListener.queue.take();
+            HistoryInterval historyInterval = HistoryIntervalListener.queue.take();
             spoutOutputCollector.emit(new Values(historyInterval.getRequestId(), historyInterval.getTimestamp(), historyInterval.getClose()));
         } catch (InterruptedException e) {
             e.printStackTrace();

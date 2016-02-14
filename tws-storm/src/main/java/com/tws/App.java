@@ -18,15 +18,15 @@ public class App
     public static void main( String[] args )  {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("storm-spring.xml");
 
-//        Config conf = new Config();
-//        conf.setDebug(true);
-//        conf.setNumWorkers(2);
-//
-//        TopologyBuilder builder = new TopologyBuilder();
-//        builder.setSpout("history", new TestSpout(), 5);
-//
-//        LocalCluster cluster = new LocalCluster();
-//        cluster.submitTopology("test", conf, builder.createTopology());
+        Config conf = new Config();
+        conf.setDebug(true);
+        conf.setNumWorkers(2);
+
+        TopologyBuilder builder = new TopologyBuilder();
+        builder.setSpout("history", new TestSpout(), 5);
+
+        LocalCluster cluster = new LocalCluster();
+        cluster.submitTopology("test", conf, builder.createTopology());
 
     }
 }

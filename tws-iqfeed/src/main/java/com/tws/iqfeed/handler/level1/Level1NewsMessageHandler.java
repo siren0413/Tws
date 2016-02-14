@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.tws.iqfeed.common.Constants.*;
+import static com.tws.shared.Constants.*;
 
 /**
  * Created by admin on 2/13/2016.

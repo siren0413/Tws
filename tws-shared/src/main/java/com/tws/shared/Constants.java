@@ -1,4 +1,4 @@
-package com.tws.iqfeed.common;
+package com.tws.shared;
 
 /**
  * Created by admin on 2/13/2016.

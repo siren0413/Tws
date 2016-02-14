@@ -12,25 +12,11 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <import resource="classpath:shared-spring.xml"/>
     <import resource="classpath:message-spring.xml"/>
 
-    <bean id="historyIntervalDecoder" class="com.tws.shared.iqfeed.decoder.HistoryIntervalMessageDecoder"/>
-
-    <bean id="subscriber" class="com.tws.zeromq.ZeromqSubscriber">
-        <property name="topic" value="HISTORY_DATA"/>
-        <property name="url" value="tcp://127.0.0.1:5799"/>
-        <property name="numIOThreads" value="5"/>
-        <property name="poolSize" value="5"/>
-        <property name="messageListener">
-            <bean class="com.tws.storm.HistoryMessageListener">
-                <property name="historyIntervalMessageDecoder" ref="historyIntervalDecoder"/>
-            </bean>
-        </property>
-    </bean>
-
     <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
         <rabbit:listener ref="level1SummaryListener" method="onMessageReceived" queues="STORM.LEVEL1.SUMMARY" />
         <rabbit:listener ref="level1UpdateListener" method="onMessageReceived" queues="STORM.LEVEL1.UPDATE" />
         <rabbit:listener ref="level1TimeListener" method="onMessageReceived" queues="STORM.LEVEL1.TIME" />
-        <rabbit:listener ref="historyListener" method="onMessageReceived" queues="STORM.HISTORY" />
+        <rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="STORM.HISTORY.HI" />
     </rabbit:listener-container>
 
     <!-- level 1 -->
@@ -53,13 +39,13 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <!-- history -->
     <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >
         <rabbit:bindings>
-            <rabbit:binding pattern="#" queue="STORM.HISTORY" />
+            <rabbit:binding pattern="HI.#" queue="STORM.HISTORY.HI" />
         </rabbit:bindings>
     </rabbit:topic-exchange>
 
-    <rabbit:queue auto-declare="true" name="STORM.HISTORY" durable="false" auto-delete="true" />
+    <rabbit:queue auto-declare="true" name="STORM.HISTORY.HI" durable="false" auto-delete="true" />
 
-    <bean id="historyListener" class="com.tws.storm.HistoryListener" />
+    <bean id="historyIntervalListener" class="com.tws.storm.listener.HistoryIntervalListener" />
 
 
 </beans>

@@ -7,7 +7,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.tws.iqfeed.common.Constants.*;
+import static com.tws.shared.Constants.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

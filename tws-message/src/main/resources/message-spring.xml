@@ -10,35 +10,37 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <context:property-placeholder location="classpath:*.properties"/>
     <context:component-scan base-package="com.tws.rabbitmq" />
 
-    <rabbit:connection-factory id="connectionFactory" host="10.0.1.15" username="admin" password="admin" />
+    <rabbit:connection-factory id="connectionFactory" host="10.0.1.48" username="admin" password="admin" />
 
     <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" />
 
     <rabbit:admin id="admin" connection-factory="connectionFactory" auto-startup="true" />
 
-    <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-        <property name="brokerURL" value="${activemq.broker.url}"/>
-        <property name="alwaysSessionAsync" value="true"/>
-        <property name="dispatchAsync" value="true"/>
-        <property name="copyMessageOnSend" value="false"/>
-        <property name="sendAcksAsync" value="true"/>
-        <property name="useAsyncSend" value="true"/>
-        <property name="useCompression" value="false"/>
-    </bean>
+    <rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="true" />
+    <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" />
 
-    <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"  destroy-method="stop">
-        <property name="connectionFactory" ref="activemqConnectionFactory"/>
-        <property name="createConnectionOnStartup" value="${activemq.create.connection.startup}"/>
-        <property name="reconnectOnException" value="true"/>
-    </bean>
+    <!--<bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">-->
+        <!--<property name="brokerURL" value="${activemq.broker.url}"/>-->
+        <!--<property name="alwaysSessionAsync" value="true"/>-->
+        <!--<property name="dispatchAsync" value="true"/>-->
+        <!--<property name="copyMessageOnSend" value="false"/>-->
+        <!--<property name="sendAcksAsync" value="true"/>-->
+        <!--<property name="useAsyncSend" value="true"/>-->
+        <!--<property name="useCompression" value="false"/>-->
+    <!--</bean>-->
 
-    <!-- publish -->
-    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="pubSubDomain" value="true"/>
-        <property name="deliveryPersistent" value="false"/>
-        <property name="sessionTransacted" value="false"/>
-    </bean>
+    <!--<bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"  destroy-method="stop">-->
+        <!--<property name="connectionFactory" ref="activemqConnectionFactory"/>-->
+        <!--<property name="createConnectionOnStartup" value="${activemq.create.connection.startup}"/>-->
+        <!--<property name="reconnectOnException" value="true"/>-->
+    <!--</bean>-->
+
+    <!--<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">-->
+        <!--<property name="connectionFactory" ref="jmsConnectionFactory"/>-->
+        <!--<property name="pubSubDomain" value="true"/>-->
+        <!--<property name="deliveryPersistent" value="false"/>-->
+        <!--<property name="sessionTransacted" value="false"/>-->
+    <!--</bean>-->
 
     <!--<bean id="listenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
         <!--<property name="connectionFactory" ref="jmsConnectionFactory"/>-->

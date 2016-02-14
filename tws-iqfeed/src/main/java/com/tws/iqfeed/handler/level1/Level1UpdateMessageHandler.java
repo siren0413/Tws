@@ -8,7 +8,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.tws.iqfeed.common.Constants.*;
+import static com.tws.shared.Constants.*;
 
 import java.util.List;
 

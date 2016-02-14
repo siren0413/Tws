@@ -1,6 +1,5 @@
 package com.tws.iqfeed.netty;
 
-import com.tws.iqfeed.handler.HistoryErrorDetectHandler;
 import com.tws.iqfeed.handler.MessageSplitterHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;

@@ -8,14 +8,14 @@
 http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
     <context:property-placeholder location="classpath:*.properties"/>
-    <context:component-scan base-package="com.tws"/>
+    <context:component-scan base-package="com.tws.iqfeed"/>
     <import resource="classpath:message-spring.xml"/>
 
     <bean id="level1Pool" class="com.tws.iqfeed.netty.ConnectionPool">
-        <property name="host" value="127.0.0.1"/>
-        <property name="port" value="5009"/>
-        <property name="poolSize" value="2"/>
-        <property name="fixed" value="true"/>
+        <property name="host" value="${iqfeed.host}"/>
+        <property name="port" value="${iqfeed.level1.port}"/>
+        <property name="poolSize" value="${iqfeed.level1.pool.size}"/>
+        <property name="fixed" value="${iqfeed.level1.pool.fixed}"/>
         <property name="handler">
             <list>
                 <bean class="com.tws.iqfeed.handler.level1.Level1ErrorMessageHandler"/>
@@ -34,16 +34,16 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
     <bean id="level1Socket" class="com.tws.iqfeed.netty.Level1Socket">
         <property name="pool" ref="level1Pool"/>
-        <property name="numThreads" value="3"/>
-        <property name="poolSize" value="2"/>
+        <property name="numThreads" value="${iqfeed.level1.socket.num.threads}"/>
+        <property name="poolSize" value="${iqfeed.level1.socket.pool.size}"/>
         <property name="symbolList" value="${symbol.list}"/>
     </bean>
 
     <bean id="historyPool" class="com.tws.iqfeed.netty.ConnectionPool">
-        <property name="host" value="127.0.0.1"/>
-        <property name="port" value="9100"/>
-        <property name="poolSize" value="3"/>
-        <property name="fixed" value="true"/>
+        <property name="host" value="${iqfeed.host}"/>
+        <property name="port" value="${iqfeed.history.port}"/>
+        <property name="poolSize" value="${iqfeed.history.pool.size}"/>
+        <property name="fixed" value="${iqfeed.history.pool.fixed}"/>
         <property name="handler">
             <list>
                 <bean class="com.tws.iqfeed.handler.history.HistoryErrorMessageHandler"/>
@@ -56,50 +56,19 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
     <bean id="historySocket" class="com.tws.iqfeed.netty.HistorySocket">
         <property name="pool" ref="historyPool"/>
-        <property name="numThreads" value="3"/>
-        <property name="poolSize" value="3"/>
+        <property name="numThreads" value="${iqfeed.history.socket.num.threads}"/>
+        <property name="poolSize" value="${iqfeed.history.socket.pool.size}"/>
     </bean>
 
+    <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
 
-    <bean id="level1ListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="autoStartup" value="true"/>
-        <property name="pubSubDomain" value="true"/>
-        <property name="sessionTransacted" value="false"/>
-        <property name="destinationName" value="LEVEL1_LISTEN"/>
-        <property name="messageListener">
-            <bean class="com.tws.iqfeed.netty.Level1MessageListener"/>
-        </property>
-    </bean>
-
-    <bean id="historyListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="autoStartup" value="true"/>
-        <property name="pubSubDomain" value="true"/>
-        <property name="sessionTransacted" value="false"/>
-        <property name="destinationName" value="HISTORY_LISTEN"/>
-        <property name="messageListener">
-            <bean class="com.tws.iqfeed.netty.HistoryMessageListener"/>
-        </property>
-    </bean>
-
-    <!--<rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="false" auto-delete="true" >-->
-    <!--</rabbit:topic-exchange>-->
-
-    <!--<rabbit:topic-exchange name="History" auto-declare="true" durable="false" auto-delete="true" >-->
-        <!--<rabbit:bindings>-->
-            <!--<rabbit:binding pattern="cmd.history.*" queue="X-IQFEED.HISTORY" />-->
-        <!--</rabbit:bindings>-->
-    <!--</rabbit:topic-exchange>-->
-
-    <rabbit:queue auto-declare="true" name="X-IQFEED.HISTORY" durable="false" auto-delete="true" />
-
-    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
-        <rabbit:listener ref="historyCommandListener" method="onMessageReceived" queues="X-IQFEED.HISTORY" />
+    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none">
+        <rabbit:listener ref="historyCommandListener" method="onMessageReceived" queues="CMD.HISTORY" />
     </rabbit:listener-container>
+
+    <rabbit:queue auto-declare="true" name="CMD.HISTORY" durable="false"/>
 
     <bean id="historyCommandListener" class="com.tws.iqfeed.listener.HistoryCommandListener" />
 
-    <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
 
 </beans>
