@@ -1,5 +1,11 @@
 package com.tws;
 
+import backtype.storm.Config;
+import backtype.storm.LocalCluster;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
+import backtype.storm.utils.Utils;
+import com.tws.storm.TestSpout;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -11,6 +17,16 @@ public class App
 {
     public static void main( String[] args )  {
         ApplicationContext ctx = new ClassPathXmlApplicationContext("storm-spring.xml");
-        ctx.getBean("historyMessageDecoder");
+
+//        Config conf = new Config();
+//        conf.setDebug(true);
+//        conf.setNumWorkers(2);
+//
+//        TopologyBuilder builder = new TopologyBuilder();
+//        builder.setSpout("history", new TestSpout(), 5);
+//
+//        LocalCluster cluster = new LocalCluster();
+//        cluster.submitTopology("test", conf, builder.createTopology());
+
     }
 }

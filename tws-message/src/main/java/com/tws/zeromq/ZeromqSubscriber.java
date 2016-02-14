@@ -41,7 +41,7 @@ public class ZeromqSubscriber implements InitializingBean {
             while (true) {
                 String msg = subscriber.recvStr();
                 String content = msg.substring(msg.indexOf(" ") + 1);
-                messageListener.onMessageReceived(msg);
+                messageListener.onMessageReceived(content);
             }
         }
     }

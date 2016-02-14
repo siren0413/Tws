@@ -2,7 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
     <context:property-placeholder location="classpath:*.properties"/>
     <context:component-scan base-package="com.tws"/>
@@ -14,11 +17,18 @@
         <property name="poolSize" value="2"/>
         <property name="fixed" value="true"/>
         <property name="handler">
-            <bean class="com.tws.iqfeed.netty.Level1Handler">
-                <property name="publisher">
-                    <bean class="com.tws.activemq.ActivemqPublisher"/>
-                </property>
-            </bean>
+            <list>
+                <bean class="com.tws.iqfeed.handler.ErrorMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1SymbolNotFoundHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1TimeMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1UpdateMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1RegionalMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1SummaryMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1FundamentalMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1SystemMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1NewsMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1UnsupportedMessageHandler"/>
+            </list>
         </property>
     </bean>
 
@@ -35,9 +45,10 @@
         <property name="poolSize" value="3"/>
         <property name="fixed" value="true"/>
         <property name="handler">
-            <bean class="com.tws.iqfeed.netty.HistoryHandler">
-                <property name="publisher" ref="publisher"/>
-            </bean>
+            <list>
+                <bean class="com.tws.iqfeed.handler.HistoryErrorDetectHandler"/>
+                <bean class="com.tws.iqfeed.handler.HistoryHandler"/>
+            </list>
         </property>
     </bean>
 
@@ -70,9 +81,25 @@
         </property>
     </bean>
 
-    <bean id="publisher" class="com.tws.zeromq.ZeromqPublisher">
-        <property name="port" value="5799"/>
-        <property name="numIOThreads" value="5"/>
-    </bean>
+    <!--<bean id="publisher" class="com.tws.activemq.ActivemqPublisher"/>-->
+
+    <rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="false" auto-delete="true" >
+    </rabbit:topic-exchange>
+
+    <rabbit:topic-exchange name="History" auto-declare="true" durable="false" auto-delete="true" >
+        <rabbit:bindings>
+            <rabbit:binding pattern="cmd.history.*" queue="X-IQFEED.HISTORY" />
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <rabbit:queue auto-declare="true" name="X-IQFEED.HISTORY" durable="false" auto-delete="true" />
+
+    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
+        <rabbit:listener ref="historyCommandListener" method="onMessageReceived" queues="X-IQFEED.HISTORY" />
+    </rabbit:listener-container>
+
+    <bean id="historyCommandListener" class="com.tws.iqfeed.listener.HistoryCommandListener" />
+
+    <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
 
 </beans>

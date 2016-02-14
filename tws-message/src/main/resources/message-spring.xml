@@ -2,16 +2,19 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
     <context:property-placeholder location="classpath:*.properties"/>
+    <context:component-scan base-package="com.tws.rabbitmq" />
 
-    <!--<bean id="defaultProperties" class="com.tws.message.DefaultProperties">-->
-        <!--<property name="brokerList" value="${broker.list}"/>-->
-        <!--<property name="serializerClass" value="${serializer.class}"/>-->
-        <!--<property name="zookeeperConnect" value="${zookeeper.connect}"/>-->
-    <!--</bean>-->
+    <rabbit:connection-factory id="connectionFactory" host="10.0.1.15" username="admin" password="admin" />
 
+    <rabbit:template id="amqpTemplate" connection-factory="connectionFactory" />
+
+    <rabbit:admin id="admin" connection-factory="connectionFactory" auto-startup="true" />
 
     <bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL" value="${activemq.broker.url}"/>
@@ -20,12 +23,11 @@
         <property name="copyMessageOnSend" value="false"/>
         <property name="sendAcksAsync" value="true"/>
         <property name="useAsyncSend" value="true"/>
-        <property name="useCompression" value="true"/>
+        <property name="useCompression" value="false"/>
     </bean>
 
     <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"  destroy-method="stop">
         <property name="connectionFactory" ref="activemqConnectionFactory"/>
-        <property name="maxConnections" value="10"/>
         <property name="createConnectionOnStartup" value="${activemq.create.connection.startup}"/>
         <property name="reconnectOnException" value="true"/>
     </bean>
@@ -50,15 +52,8 @@
     <!--</bean>-->
 
     <!--<bean id="publisher" class="com.tws.activemq.ActivemqPublisher">-->
-        <!--<property name="template" ref="jmsTemplate"/>-->
+        <!--<property name="te" ref="jmsTemplate"/>-->
     <!--</bean>-->
-
-
-
-
-
-
-
 
 
     <!--<bean id="consumer" class="com.tws.message.KafkaConsumer">-->
