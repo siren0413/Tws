@@ -1,9 +1,11 @@
 package com.tws.shared.iqfeed.model;
 
+import java.io.Serializable;
+
 /**
  * Created by admin on 2/11/2016.
  */
-public class Level1Tick {
+public class Level1Update implements Serializable {
     private String symbol;
     private float bid;
     private int bidSize;

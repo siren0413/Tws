@@ -1,8 +1,8 @@
 package com.tws.iqfeed.handler.history;
 
 import com.tws.rabbitmq.RabbitmqPublisher;
-import com.tws.shared.iqfeed.model.HistoryInterval;
 import com.tws.shared.iqfeed.model.HistoryTick;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * Created by admin on 2/13/2016.
  */
+@ChannelHandler.Sharable
 public class HistoryTickMessageHandler extends SimpleChannelInboundHandler<List<String>> {
 
     @Autowired
