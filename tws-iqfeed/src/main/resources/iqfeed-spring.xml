@@ -18,7 +18,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="fixed" value="true"/>
         <property name="handler">
             <list>
-                <bean class="com.tws.iqfeed.handler.ErrorMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.level1.Level1ErrorMessageHandler"/>
                 <bean class="com.tws.iqfeed.handler.level1.Level1SymbolNotFoundHandler"/>
                 <bean class="com.tws.iqfeed.handler.level1.Level1TimeMessageHandler"/>
                 <bean class="com.tws.iqfeed.handler.level1.Level1UpdateMessageHandler"/>
@@ -46,8 +46,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="fixed" value="true"/>
         <property name="handler">
             <list>
-                <bean class="com.tws.iqfeed.handler.HistoryErrorDetectHandler"/>
-                <bean class="com.tws.iqfeed.handler.HistoryHandler"/>
+                <bean class="com.tws.iqfeed.handler.history.HistoryTickMessageHandler"/>
             </list>
         </property>
     </bean>
@@ -83,14 +82,14 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
     <!--<bean id="publisher" class="com.tws.activemq.ActivemqPublisher"/>-->
 
-    <rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="false" auto-delete="true" >
-    </rabbit:topic-exchange>
+    <!--<rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="false" auto-delete="true" >-->
+    <!--</rabbit:topic-exchange>-->
 
-    <rabbit:topic-exchange name="History" auto-declare="true" durable="false" auto-delete="true" >
-        <rabbit:bindings>
-            <rabbit:binding pattern="cmd.history.*" queue="X-IQFEED.HISTORY" />
-        </rabbit:bindings>
-    </rabbit:topic-exchange>
+    <!--<rabbit:topic-exchange name="History" auto-declare="true" durable="false" auto-delete="true" >-->
+        <!--<rabbit:bindings>-->
+            <!--<rabbit:binding pattern="cmd.history.*" queue="X-IQFEED.HISTORY" />-->
+        <!--</rabbit:bindings>-->
+    <!--</rabbit:topic-exchange>-->
 
     <rabbit:queue auto-declare="true" name="X-IQFEED.HISTORY" durable="false" auto-delete="true" />
 

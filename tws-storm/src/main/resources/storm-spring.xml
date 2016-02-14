@@ -26,18 +26,32 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         </property>
     </bean>
 
-
-    <rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="false" auto-delete="true" >
-        <rabbit:bindings>
-            <rabbit:binding pattern="*" queue="STORM.LEVEL1" />
-        </rabbit:bindings>
-    </rabbit:topic-exchange>
-    <rabbit:queue auto-declare="true" name="STORM.LEVEL1" durable="false" auto-delete="true" />
-
     <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
         <rabbit:listener ref="level1Listener" method="onMessageReceived" queues="STORM.LEVEL1" />
+        <rabbit:listener ref="historyListener" method="onMessageReceived" queues="STORM.HISTORY" />
     </rabbit:listener-container>
 
+    <!-- level 1 -->
+    <rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="true" >
+        <rabbit:bindings>
+            <rabbit:binding pattern="#" queue="STORM.LEVEL1" />
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <rabbit:queue auto-declare="true" name="STORM.LEVEL1" durable="false" auto-delete="true" />
+
     <bean id="level1Listener" class="com.tws.storm.Level1Listener" />
+
+    <!-- history -->
+    <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >
+        <rabbit:bindings>
+            <rabbit:binding pattern="#" queue="STORM.HISTORY" />
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <rabbit:queue auto-declare="true" name="STORM.HISTORY" durable="false" auto-delete="true" />
+
+    <bean id="historyListener" class="com.tws.storm.HistoryListener" />
+
 
 </beans>

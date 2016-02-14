@@ -49,7 +49,8 @@ public class Main {
         ctx.getBean("level1Socket");
         HistorySocket socket = (HistorySocket) ctx.getBean("historySocket");
 //        socket.publish(Command.Level1.SET_PROTOCOL());
-//        socket.publish("HTX,AAPL,,,AAPL,\r\n");
+        socket.send("HTT,AAPL,20160205 093000,20160210 093100,,,,,AAPL,\r\n");
+//        socket.send("HTX,AAPL,,,AAPL,\r\n");
 //        socket.publish("HTX,FB,,,FB,\r\n");
 //        socket.publish("HTX,GOOG,,,GOOG,\r\n");
         logger.info("*************************");

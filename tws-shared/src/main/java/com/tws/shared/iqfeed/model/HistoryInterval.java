@@ -1,9 +1,11 @@
 package com.tws.shared.iqfeed.model;
 
+import java.io.Serializable;
+
 /**
  * Created by admin on 2/10/2016.
  */
-public class HistoryInterval {
+public class HistoryInterval implements Serializable{
     private String requestId;
     private String timestamp;
     private float high;

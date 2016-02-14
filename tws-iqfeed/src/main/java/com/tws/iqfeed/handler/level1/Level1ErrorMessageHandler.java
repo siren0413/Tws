@@ -1,4 +1,4 @@
-package com.tws.iqfeed.handler;
+package com.tws.iqfeed.handler.level1;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,9 +12,9 @@ import java.util.List;
  * Created by admin on 2/13/2016.
  */
 @ChannelHandler.Sharable
-public class ErrorMessageHandler extends SimpleChannelInboundHandler<List<String>> {
+public class Level1ErrorMessageHandler extends SimpleChannelInboundHandler<List<String>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ErrorMessageHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(Level1ErrorMessageHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
