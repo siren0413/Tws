@@ -87,4 +87,19 @@ public class HistoryInterval implements Serializable{
     public void setNumTrades(int numTrades) {
         this.numTrades = numTrades;
     }
+
+    @Override
+    public String toString() {
+        return "HistoryInterval{" +
+                "requestId='" + requestId + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                ", high=" + high +
+                ", low=" + low +
+                ", open=" + open +
+                ", close=" + close +
+                ", totalVolume=" + totalVolume +
+                ", periodVolume=" + periodVolume +
+                ", numTrades=" + numTrades +
+                '}';
+    }
 }

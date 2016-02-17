@@ -113,4 +113,21 @@ public class HistoryIntervalDB implements Serializable{
     public void setNumTrades(int numTrades) {
         this.numTrades = numTrades;
     }
+
+    @Override
+    public String toString() {
+        return "HistoryIntervalDB{" +
+                "symbol='" + symbol + '\'' +
+                ", interval=" + interval +
+                ", time=" + time +
+                ", timestamp='" + timestamp + '\'' +
+                ", high=" + high +
+                ", low=" + low +
+                ", open=" + open +
+                ", close=" + close +
+                ", totalVolume=" + totalVolume +
+                ", periodVolume=" + periodVolume +
+                ", numTrades=" + numTrades +
+                '}';
+    }
 }

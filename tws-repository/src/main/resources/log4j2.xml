@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration status="info" monitorInterval="60">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p %-25.25t %c{1}:%L - %msg%n"/>
+        </Console>
+        <RollingFile name="InfoRollingFile" fileName="logs/info.log" filePattern="logs/$${date:yyyyMM}/info-%d{yyyy-MM-dd-HH}.%i.log" immediateFlush="true">
+            <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p [%t] %c{1}:%L - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
+        <RollingFile name="ErrorRollingFile" fileName="logs/alert.log" filePattern="logs/$${date:yyyyMM}/alert-%d{yyyy-MM-dd-HH}.%i.log" immediateFlush="true">
+            <PatternLayout pattern="%d{MM/dd/yy HH:mm:ss,SSS} %-5p [%t] %c{1}:%L - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <OnStartupTriggeringPolicy  />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="InfoRollingFile" level="info"/>
+            <AppenderRef ref="ErrorRollingFile" level="error"/>
+        </Root>
+    </Loggers>
+</configuration>

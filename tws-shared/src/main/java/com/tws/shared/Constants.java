@@ -20,4 +20,6 @@ public class Constants {
     public static final String HISTORY_EXCHANGE = "HISTORY";
     public static final String HISTORY_TICK_ROUTEKEY_PREFIX = "HT";
     public static final String HISTORY_INTERVAL_ROUTEKEY_PREFIX = "HI";
+    public static final String HISTORY_COMMAND_ROUTEKEY_PREFIX = "CMD";
+
 }

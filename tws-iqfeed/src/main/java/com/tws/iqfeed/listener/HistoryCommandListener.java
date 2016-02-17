@@ -16,7 +16,12 @@ public class HistoryCommandListener {
     private HistorySocket historySocket;
 
     public void onMessageReceived(Object message) {
-        String msg = new String((byte[]) message);
+        String msg;
+        if(message instanceof byte[]) {
+            msg = new String((byte[]) message);
+        }else{
+            msg = (String)message;
+        }
         System.out.println(msg);
         if (msg.contains("\\r\\n")) {
             msg = msg.replace("\\r\\n", "");

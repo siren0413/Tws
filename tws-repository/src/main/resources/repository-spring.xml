@@ -2,37 +2,71 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:hdp="http://www.springframework.org/schema/hadoop"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
        xmlns:p="http://www.springframework.org/schema/p"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-	http://www.springframework.org/schema/hadoop http://www.springframework.org/schema/hadoop/spring-hadoop.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
 
     <context:property-placeholder location="classpath:*.properties"/>
     <context:component-scan base-package="com.tws.repository"/>
-    <import resource="classpath:message-spring.xml" />
-    <import resource="classpath:shared-spring.xml" />
+    <import resource="classpath:message-spring.xml"/>
+    <import resource="classpath:shared-spring.xml"/>
+    <import resource="classpath:cassandra-spring.xml"/>
 
-    <hdp:configuration id="hadoopConfiguration">
-        fs.defaultFS=hdfs://10.0.1.27:8020
-    </hdp:configuration>
 
-    <hdp:hbase-configuration zk-quorum="${hbase.zk.host}" zk-port="${hbase.zk.port}"/>
-
-    <bean id="hbaseTemplate" class="org.springframework.data.hadoop.hbase.HbaseTemplate">
-        <property name="configuration" ref="hbaseConfiguration"/>
-        <property name="autoFlush" value="true"/>
-    </bean>
-
-    <bean id="level1ListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-        <property name="connectionFactory" ref="jmsConnectionFactory"/>
-        <property name="autoStartup" value="true"/>
-        <property name="pubSubDomain" value="true"/>
-        <property name="sessionTransacted" value="false"/>
-        <property name="destinationName" value="HISTORY_TOPIC"/>
-        <property name="messageListener">
-            <bean class="com.tws.repository.HistoryFeedListener"/>
+    <bean name="historyIntervalUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.tws.repository.job.HistoryIntervalUpdateJob" />
+        <property name="name" value="historyUpdateJob"/>
+        <property name="group" value="history"/>
+        <property name="durability" value="true" />
+        <property name="requestsRecovery" value="true"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="intervalList" value="${history.interval.list}"/>
+                <entry key="secondStartDate" value="${history.interval.second.start.date}"/>
+                <entry key="minuteStartDate" value="${history.interval.minute.start.date}"/>
+                <entry key="dayStartDate" value="${history.interval.day.start.date}"/>
+            </map>
         </property>
     </bean>
+
+    <bean id="historyIntervalTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="historyIntervalUpdateJob"/>
+        <property name="repeatInterval" value="50000"/>
+        <property name="startDelay" value="1000"/>
+    </bean>
+
+    <bean id="autoWireSpringBeanJobFactory" class="com.tws.repository.AutowiringSpringBeanJobFactory"/>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="historyIntervalTrigger" />
+            </list>
+        </property>
+        <property name="jobFactory" ref="autoWireSpringBeanJobFactory"/>
+    </bean>
+
+    <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
+
+    <bean id="dbUpdateService" class="com.tws.repository.service.DBUpdateService"/>
+
+    <bean id="historyCommandService" class="com.tws.repository.service.HistoryCommandService"/>
+
+
+    <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >
+        <rabbit:bindings>
+            <rabbit:binding pattern="HI.#" queue="REPOSITORY.HISTORY.HI" />
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <rabbit:queue auto-declare="true" name="REPOSITORY.HISTORY.HI" durable="false" auto-delete="true" />
+
+    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
+        <rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="REPOSITORY.HISTORY.HI" />
+    </rabbit:listener-container>
+
+    <bean id="historyIntervalListener" class="com.tws.repository.listener.HistoryIntervalListener" />
 
 </beans>

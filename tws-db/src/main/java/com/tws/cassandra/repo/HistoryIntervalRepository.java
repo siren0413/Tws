@@ -44,6 +44,11 @@ public class HistoryIntervalRepository implements InitializingBean, HistoryInter
         return accessor.getIntervalInTime(symbol, interval, start);
     }
 
+    @Override
+    public HistoryIntervalDB getMostRecentRecordInTime(@Param("symbol") String symbol, @Param("interval") int interval) {
+        return accessor.getMostRecentRecordInTime(symbol, interval);
+    }
+
     public void saveIntervalInTime(HistoryIntervalDB historyIntervalDB){
         mapper.saveAsync(historyIntervalDB);
     }
