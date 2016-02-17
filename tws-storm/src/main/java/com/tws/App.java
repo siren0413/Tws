@@ -8,6 +8,7 @@ import backtype.storm.utils.Utils;
 import com.tws.storm.TestSpout;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import storm.trident.TridentTopology;
 
 /**
  * Hello world!
@@ -27,6 +28,7 @@ public class App
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("test", conf, builder.createTopology());
+
 
     }
 }

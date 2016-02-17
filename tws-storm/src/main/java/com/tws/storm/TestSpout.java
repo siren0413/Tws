@@ -27,11 +27,11 @@ public class TestSpout extends BaseRichSpout {
     }
 
     public void nextTuple() {
-        try {
-            HistoryInterval historyInterval = HistoryIntervalListener.queue.take();
-            spoutOutputCollector.emit(new Values(historyInterval.getRequestId(), historyInterval.getTimestamp(), historyInterval.getClose()));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            HistoryInterval historyInterval = HistoryIntervalListener.queue.take();
+//            spoutOutputCollector.emit(new Values(historyInterval.getRequestId(), historyInterval.getTimestamp(), historyInterval.getClose()));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 }

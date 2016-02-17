@@ -11,22 +11,18 @@ import java.util.Map;
 /**
  * Created by admin on 2/14/2016.
  */
-public class HistoryIntervalSpout extends BaseRichSpout {
+public abstract class HistoryIntervalBase extends BaseRichSpout {
 
-    private SpoutOutputCollector spoutOutputCollector;
+    protected SpoutOutputCollector spoutOutputCollector;
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("requestId","timestamp","high", "low", "open", "close", "totalVolume", "periodVolume", "numTrades"));
+        outputFieldsDeclarer.declare(new Fields("requestId", "timestamp", "high", "low", "open", "close", "totalVolume", "periodVolume", "numTrades"));
     }
 
     @Override
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
-
+        this.spoutOutputCollector = spoutOutputCollector;
     }
 
-    @Override
-    public void nextTuple() {
-
-    }
 }

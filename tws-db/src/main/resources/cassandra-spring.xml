@@ -10,20 +10,15 @@
 
     <context:component-scan base-package="com.tws.cassandra"/>
 
+    <cassandra:cluster id="twsCluster" contact-points="10.0.1.48" port="9042"/>
+
+    <cassandra:session id="historySession" cluster-ref="twsCluster" keyspace-name="history"/>
+
     <cassandra:converter/>
+
     <cassandra:mapping/>
 
-    <cassandra:cluster id="twsCluster" contact-points="10.0.1.15" port="9042"/>
-
-    <cassandra:session id="stockSession" cluster-ref="twsCluster" keyspace-name="stock"/>
-
-
-    <beans:bean id="tickDAO" class="com.tws.cassandra.dao.TickDAO">
-        <beans:constructor-arg ref="stockSession"/>
-    </beans:bean>
-
-    <beans:bean id="tickRepository" class="com.tws.cassandra.repository.TickRepository"/>
-
+    <beans:bean id="historyIntervalRepo" class="com.tws.cassandra.repo.HistoryIntervalRepository" />
 
 
 </beans:beans>

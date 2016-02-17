@@ -15,6 +15,8 @@ public class Constants {
     public static final String LEVEL1_SYSTEM_ROUTEKEY_PREFIX = "S";
     public static final String LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX = "T";
 
+    public static final String LEVEL1_SYSTEM_WATCH_KEY = "WATCHES";
+
     public static final String HISTORY_EXCHANGE = "HISTORY";
     public static final String HISTORY_TICK_ROUTEKEY_PREFIX = "HT";
     public static final String HISTORY_INTERVAL_ROUTEKEY_PREFIX = "HI";
