@@ -1,8 +1,7 @@
 package com.tws.repository.job;
 
 import com.tws.repository.GlobalQueues;
-import com.tws.repository.service.DBUpdateService;
-import org.apache.commons.lang3.math.NumberUtils;
+import com.tws.repository.service.HistoryIntervalUpdateService;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,7 +32,7 @@ public class HistoryIntervalUpdateJob extends QuartzJobBean {
     private Date dayStartDate;
 
     @Autowired
-    private DBUpdateService dbUpdateService;
+    private HistoryIntervalUpdateService dbUpdateService;
 
     private void init(JobDataMap map) {
         String intervalString = map.getString("intervalList");
@@ -81,18 +79,6 @@ public class HistoryIntervalUpdateJob extends QuartzJobBean {
 
         logger.info("job: {}, load symbol: {}", jobKey, symbols);
 
-        for (String symbol : symbols) {
-            for (String intervalStr : intervals) {
-                int interval = NumberUtils.toInt(intervalStr);
-                if (interval < 60) {
-                    dbUpdateService.update(symbol, interval, secondStartDate.getTime());
-                } else if (interval < 86400) {
-                    dbUpdateService.update(symbol, interval, minuteStartDate.getTime());
-                } else {
-                    dbUpdateService.update(symbol, interval, dayStartDate.getTime());
-                }
-            }
-        }
     }
 
 

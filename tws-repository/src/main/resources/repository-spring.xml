@@ -16,24 +16,24 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
 
     <bean name="historyIntervalUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="com.tws.repository.job.HistoryIntervalUpdateJob" />
+        <property name="jobClass" value="com.tws.repository.job.HistorySecondUpdateJob" />
         <property name="name" value="historyUpdateJob"/>
         <property name="group" value="history"/>
         <property name="durability" value="true" />
         <property name="requestsRecovery" value="true"/>
         <property name="jobDataAsMap">
             <map>
-                <entry key="intervalList" value="${history.interval.list}"/>
-                <entry key="secondStartDate" value="${history.interval.second.start.date}"/>
-                <entry key="minuteStartDate" value="${history.interval.minute.start.date}"/>
-                <entry key="dayStartDate" value="${history.interval.day.start.date}"/>
+                <entry key="interval" value="${history.interval.one.second}"/>
+                <entry key="startDate" value="${history.interval.second.start.date}"/>
+                <entry key="symbolList" value="${symbol.list}"/>
+                <entry key="maxDataPoints" value="${history.interval.maxDataPoints}"/>
             </map>
         </property>
     </bean>
 
     <bean id="historyIntervalTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="historyIntervalUpdateJob"/>
-        <property name="repeatInterval" value="50000"/>
+        <property name="repeatInterval" value="500"/>
         <property name="startDelay" value="1000"/>
     </bean>
 
@@ -50,9 +50,10 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
     <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
 
-    <bean id="dbUpdateService" class="com.tws.repository.service.DBUpdateService"/>
+    <bean id="dbUpdateService" class="com.tws.repository.service.HistoryIntervalUpdateService"/>
 
     <bean id="historyCommandService" class="com.tws.repository.service.HistoryCommandService"/>
+    <bean id="historyStoreService" class="com.tws.repository.service.HistoryIntervalStoreService"/>
 
 
     <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >

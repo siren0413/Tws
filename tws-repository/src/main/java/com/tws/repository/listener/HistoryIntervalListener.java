@@ -7,6 +7,7 @@ import com.tws.shared.iqfeed.model.HistoryInterval;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
@@ -14,17 +15,7 @@ import java.text.SimpleDateFormat;
  */
 public class HistoryIntervalListener {
 
-    @Autowired
-    private HistoryIntervalRepository historyIntervalRepository;
-
     public void onMessageReceived(HistoryInterval historyInterval) {
-        HistoryIntervalDB historyIntervalDB = new HistoryIntervalDB();
-        String[] parts = historyInterval.getRequestId().split(".");
-        historyIntervalDB.setSymbol(parts[0]);
-        historyIntervalDB.setInterval(NumberUtils.toInt(parts[1]));
-        SimpleDateFormat sdf = new SimpleDateFormat("");
-        historyIntervalDB.setTime();
-        historyIntervalRepository.saveIntervalInTime();
         GlobalQueues.historyIntervals.offer(historyInterval);
     }
 }
