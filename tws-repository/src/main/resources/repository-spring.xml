@@ -33,7 +33,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
     <bean id="historyIntervalTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="historyIntervalUpdateJob"/>
-        <property name="repeatInterval" value="500"/>
+        <property name="repeatInterval" value="2000"/>
         <property name="startDelay" value="1000"/>
     </bean>
 
@@ -48,26 +48,36 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="jobFactory" ref="autoWireSpringBeanJobFactory"/>
     </bean>
 
-    <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
-
     <bean id="dbUpdateService" class="com.tws.repository.service.HistoryIntervalUpdateService"/>
 
     <bean id="historyCommandService" class="com.tws.repository.service.HistoryCommandService"/>
     <bean id="historyStoreService" class="com.tws.repository.service.HistoryIntervalStoreService"/>
 
+    <bean id="publisher" class="com.tws.activemq.ActivemqPublisher"/>
 
-    <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >
-        <rabbit:bindings>
-            <rabbit:binding pattern="HI.#" queue="REPOSITORY.HISTORY.HI" />
-        </rabbit:bindings>
-    </rabbit:topic-exchange>
+    <bean id="listenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="autoStartup" value="true"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="sessionTransacted" value="false"/>
+        <property name="destinationName" value="HI"/>
+        <property name="messageListener">
+            <bean class="com.tws.repository.listener.HistoryIntervalListener"/>
+        </property>
+    </bean>
 
-    <rabbit:queue auto-declare="true" name="REPOSITORY.HISTORY.HI" durable="false" auto-delete="true" />
+    <!--<rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >-->
+        <!--<rabbit:bindings>-->
+            <!--<rabbit:binding pattern="HI.#" queue="REPOSITORY.HISTORY.HI" />-->
+        <!--</rabbit:bindings>-->
+    <!--</rabbit:topic-exchange>-->
 
-    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
-        <rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="REPOSITORY.HISTORY.HI" />
-    </rabbit:listener-container>
+    <!--<rabbit:queue auto-declare="true" name="REPOSITORY.HISTORY.HI" durable="false" auto-delete="true" />-->
 
-    <bean id="historyIntervalListener" class="com.tws.repository.listener.HistoryIntervalListener" />
+    <!--<rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >-->
+        <!--<rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="REPOSITORY.HISTORY.HI" />-->
+    <!--</rabbit:listener-container>-->
+
+    <!--<bean id="historyIntervalListener" class="com.tws.repository.listener.HistoryIntervalListener" />-->
 
 </beans>

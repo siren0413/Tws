@@ -1,5 +1,6 @@
 package com.tws.iqfeed.handler.level1;
 
+import com.tws.activemq.ActivemqPublisher;
 import com.tws.rabbitmq.RabbitmqPublisher;
 import com.tws.shared.iqfeed.model.Level1Summary;
 import io.netty.channel.ChannelHandler;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -19,7 +21,7 @@ import java.util.List;
 public class Level1SummaryMessageHandler extends SimpleChannelInboundHandler<List<String>> {
 
     @Autowired
-    private RabbitmqPublisher publisher;
+    private ActivemqPublisher publisher;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
@@ -45,7 +47,8 @@ public class Level1SummaryMessageHandler extends SimpleChannelInboundHandler<Lis
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_EXCHANGE, String.join(ROUTEKEY_DELIMETER, LEVEL1_SUMMARY_ROUTEKEY_PREFIX, level1Summary.getSymbol()), level1Summary);
+            publisher.publish(LEVEL1_SUMMARY_ROUTEKEY_PREFIX, (Serializable)list);
+//            publisher.publish(LEVEL1_EXCHANGE, String.join(ROUTEKEY_DELIMETER, LEVEL1_SUMMARY_ROUTEKEY_PREFIX, level1Summary.getSymbol()), level1Summary);
         } else {
             ctx.fireChannelRead(list);
         }

@@ -60,21 +60,37 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="poolSize" value="${iqfeed.history.socket.pool.size}"/>
     </bean>
 
-    <bean id="publisher" class="com.tws.rabbitmq.RabbitmqPublisher"/>
+    <bean id="publisher" class="com.tws.activemq.ActivemqPublisher"/>
 
-    <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >
-        <rabbit:bindings>
-            <rabbit:binding pattern="CMD" queue="CMD"/>
-        </rabbit:bindings>
-    </rabbit:topic-exchange>
 
-    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" >
-        <rabbit:listener ref="historyCommandListener" method="onMessageReceived" queues="CMD" />
-    </rabbit:listener-container>
+    <bean id="listenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="autoStartup" value="true"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="sessionTransacted" value="false"/>
+        <property name="destinationName" value="CMD"/>
+        <property name="messageListener">
+            <bean class="com.tws.iqfeed.listener.HistoryCommandListener"/>
+        </property>
+    </bean>
 
-    <rabbit:queue auto-declare="true" name="CMD" durable="false" auto-delete="true"/>
 
-    <bean id="historyCommandListener" class="com.tws.iqfeed.listener.HistoryCommandListener" />
 
+
+
+
+    <!--<rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >-->
+        <!--<rabbit:bindings>-->
+            <!--<rabbit:binding pattern="CMD" queue="CMD"/>-->
+        <!--</rabbit:bindings>-->
+    <!--</rabbit:topic-exchange>-->
+
+    <!--<rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" >-->
+        <!--<rabbit:listener ref="historyCommandListener" method="onMessageReceived" queues="CMD" />-->
+    <!--</rabbit:listener-container>-->
+
+    <!--<rabbit:queue auto-declare="true" name="CMD" durable="false" auto-delete="true"/>-->
+
+    <!--<bean id="historyCommandListener" class="com.tws.iqfeed.listener.HistoryCommandListener" />-->
 
 </beans>

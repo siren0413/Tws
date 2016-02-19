@@ -1,5 +1,6 @@
 package com.tws.iqfeed.handler.history;
 
+import com.tws.activemq.ActivemqPublisher;
 import com.tws.rabbitmq.RabbitmqPublisher;
 import com.tws.shared.iqfeed.model.HistoryTick;
 import io.netty.channel.ChannelHandler;
@@ -23,7 +24,7 @@ public class HistoryTickMessageHandler extends SimpleChannelInboundHandler<List<
     private static final Logger logger = LoggerFactory.getLogger(HistoryTickMessageHandler.class);
 
     @Autowired
-    private RabbitmqPublisher publisher;
+    private ActivemqPublisher publisher;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
@@ -51,6 +52,7 @@ public class HistoryTickMessageHandler extends SimpleChannelInboundHandler<List<
             logger.error("Unsupported requestId: [{}]", requestId);
             return;
         }
-        publisher.publish(HISTORY_EXCHANGE, String.join(ROUTEKEY_DELIMETER, HISTORY_TICK_ROUTEKEY_PREFIX, historyTick.getRequestId()), historyTick);
+        publisher.publish(HISTORY_TICK_ROUTEKEY_PREFIX, historyTick);
+//        publisher.publish(HISTORY_EXCHANGE, String.join(ROUTEKEY_DELIMETER, HISTORY_TICK_ROUTEKEY_PREFIX, historyTick.getRequestId()), historyTick);
     }
 }

@@ -1,5 +1,6 @@
 package com.tws.iqfeed.handler.level1;
 
+import com.tws.activemq.ActivemqPublisher;
 import com.tws.rabbitmq.RabbitmqPublisher;
 import com.tws.shared.iqfeed.model.Level1Timestamp;
 import io.netty.channel.ChannelHandler;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,7 +20,7 @@ import java.util.List;
 public class Level1TimeMessageHandler extends SimpleChannelInboundHandler<List<String>> {
 
     @Autowired
-    private RabbitmqPublisher publisher;
+    private ActivemqPublisher publisher;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
@@ -31,7 +33,7 @@ public class Level1TimeMessageHandler extends SimpleChannelInboundHandler<List<S
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_EXCHANGE, LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX, level1Timestamp);
+            publisher.publish(LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX, (Serializable)list);
         }else{
             ctx.fireChannelRead(list);
         }

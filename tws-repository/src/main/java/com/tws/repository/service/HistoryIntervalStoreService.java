@@ -32,7 +32,13 @@ public class HistoryIntervalStoreService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        executor = Executors.newFixedThreadPool(3);
+        executor = Executors.newFixedThreadPool(10);
+        executor.submit(new Worker());
+        executor.submit(new Worker());
+        executor.submit(new Worker());
+        executor.submit(new Worker());
+        executor.submit(new Worker());
+        executor.submit(new Worker());
         executor.submit(new Worker());
         executor.submit(new Worker());
         executor.submit(new Worker());

@@ -24,28 +24,31 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="maxPoolSize" value="20" />
     </bean>
 
-    <!--<bean id="activemqConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">-->
-        <!--<property name="brokerURL" value="${activemq.broker.url}"/>-->
-        <!--<property name="alwaysSessionAsync" value="true"/>-->
-        <!--<property name="dispatchAsync" value="true"/>-->
-        <!--<property name="copyMessageOnSend" value="false"/>-->
-        <!--<property name="sendAcksAsync" value="true"/>-->
-        <!--<property name="useAsyncSend" value="true"/>-->
-        <!--<property name="useCompression" value="false"/>-->
-    <!--</bean>-->
+    <bean id="activemqConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activemq.broker.url}"/>
+        <property name="alwaysSessionAsync" value="true"/>
+        <property name="dispatchAsync" value="true"/>
+        <property name="copyMessageOnSend" value="false"/>
+        <property name="sendAcksAsync" value="true"/>
+        <property name="useAsyncSend" value="true"/>
+        <property name="useCompression" value="false"/>
+        <property name="trustAllPackages" value="true"/>
+        <property name="maxThreadPoolSize" value="20"/>
+    </bean>
 
-    <!--<bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"  destroy-method="stop">-->
-        <!--<property name="connectionFactory" ref="activemqConnectionFactory"/>-->
-        <!--<property name="createConnectionOnStartup" value="${activemq.create.connection.startup}"/>-->
-        <!--<property name="reconnectOnException" value="true"/>-->
-    <!--</bean>-->
+    <bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"  destroy-method="stop">
+        <property name="connectionFactory" ref="activemqConnectionFactory"/>
+        <property name="createConnectionOnStartup" value="${activemq.create.connection.startup}"/>
+        <property name="reconnectOnException" value="true"/>
+        <property name="maxConnections" value="10"/>
+    </bean>
 
-    <!--<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">-->
-        <!--<property name="connectionFactory" ref="jmsConnectionFactory"/>-->
-        <!--<property name="pubSubDomain" value="true"/>-->
-        <!--<property name="deliveryPersistent" value="false"/>-->
-        <!--<property name="sessionTransacted" value="false"/>-->
-    <!--</bean>-->
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="deliveryPersistent" value="false"/>
+        <property name="sessionTransacted" value="false"/>
+    </bean>
 
     <!--<bean id="listenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
         <!--<property name="connectionFactory" ref="jmsConnectionFactory"/>-->

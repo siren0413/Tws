@@ -1,8 +1,8 @@
 package com.tws.repository.service;
 
+import com.tws.activemq.ActivemqPublisher;
 import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
-import com.tws.rabbitmq.RabbitmqPublisher;
 import com.tws.shared.Constants;
 import org.quartz.JobDataMap;
 import org.slf4j.Logger;
@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+
 
 
 /**
@@ -32,7 +33,7 @@ public class HistoryIntervalUpdateService {
     private HistoryCommandService historyCommandService;
 
     @Autowired
-    private RabbitmqPublisher publisher;
+    private ActivemqPublisher publisher;
 
     public void update(JobDataMap map, String symbol, int interval, long startTime, int maxDataPoints) {
         HistoryIntervalDB historyIntervalDB = historyIntervalRepository.getMostRecentRecordInTime(symbol, interval);
@@ -85,6 +86,6 @@ public class HistoryIntervalUpdateService {
             cmd = historyCommandService.getDayIntervalCmd(symbol, interval / 86400, beginTime, endTime);
         }
         logger.info("send history command: {}", cmd);
-        publisher.publish(Constants.HISTORY_EXCHANGE, Constants.HISTORY_COMMAND_ROUTEKEY_PREFIX, cmd);
+        publisher.publish(Constants.HISTORY_COMMAND_ROUTEKEY_PREFIX, cmd);
     }
 }
