@@ -1,6 +1,7 @@
 package com.tws.iqfeed.handler.history;
 
 import com.tws.activemq.ActivemqPublisher;
+import com.tws.cassandra.repo.HistoryIntervalRepository;
 import com.tws.rabbitmq.RabbitmqPublisher;
 import com.tws.shared.iqfeed.model.HistoryInterval;
 import io.netty.channel.ChannelHandler;
@@ -25,6 +26,9 @@ public class HistoryIntervalMessageHandler extends SimpleChannelInboundHandler<L
 
     @Autowired
     private ActivemqPublisher publisher;
+
+    @Autowired
+    private HistoryIntervalRepository repository;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
@@ -51,6 +55,5 @@ public class HistoryIntervalMessageHandler extends SimpleChannelInboundHandler<L
             return;
         }
         publisher.publish(HISTORY_INTERVAL_ROUTEKEY_PREFIX, historyInterval);
-//        publisher.publish(HISTORY_EXCHANGE, String.join(ROUTEKEY_DELIMETER, HISTORY_INTERVAL_ROUTEKEY_PREFIX, historyInterval.getRequestId()), historyInterval);
     }
 }

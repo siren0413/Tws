@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -24,6 +25,7 @@ import java.util.concurrent.Executors;
 public class HistoryIntervalStoreService implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(HistoryIntervalStoreService.class);
+    public static long lastUpdateTime = 0;
 
     @Autowired
     private HistoryIntervalRepository historyIntervalRepository;
@@ -32,16 +34,11 @@ public class HistoryIntervalStoreService implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        executor = Executors.newFixedThreadPool(10);
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
-        executor.submit(new Worker());
+        int poolSize = 10;
+        executor = Executors.newFixedThreadPool(poolSize);
+        for(int i = 0; i < poolSize; i++){
+            executor.submit(new Worker());
+        }
         logger.info("History interval store service started.");
     }
 
@@ -52,6 +49,7 @@ public class HistoryIntervalStoreService implements InitializingBean {
             while (true) {
                 try {
                     HistoryInterval historyInterval = GlobalQueues.historyIntervals.take();
+                    lastUpdateTime = System.currentTimeMillis();
                     if (historyInterval != null) {
                         save(historyInterval);
                     }
@@ -71,14 +69,14 @@ public class HistoryIntervalStoreService implements InitializingBean {
             }
             ZonedDateTime zonedDateTime;
             try {
-                LocalDateTime localDateTime = LocalDateTime.parse(historyInterval.getTimestamp(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                LocalDateTime localDateTime = LocalDateTime.parse(historyInterval.getTimestamp().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 zonedDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
             } catch (DateTimeParseException e) {
                 try {
-                    LocalDateTime localDateTime = LocalDateTime.parse(historyInterval.getTimestamp(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    zonedDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
+                    LocalDate localDate = LocalDate.parse(historyInterval.getTimestamp().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    zonedDateTime = localDate.atStartOfDay(ZoneId.of("America/New_York"));
                 } catch (DateTimeParseException e1) {
-                    logger.error("unable to parse date: {}", historyInterval.getTimestamp());
+                    logger.error("unable to parse date: {}", historyInterval.getTimestamp(),e);
                     return;
                 }
             }

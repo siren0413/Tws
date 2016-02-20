@@ -14,12 +14,11 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <import resource="classpath:shared-spring.xml"/>
     <import resource="classpath:cassandra-spring.xml"/>
 
-
-    <bean name="historyIntervalUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-        <property name="jobClass" value="com.tws.repository.job.HistorySecondUpdateJob" />
-        <property name="name" value="historyUpdateJob"/>
+    <bean name="historyOneSecondUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.tws.repository.job.HistorySecondUpdateJob"/>
+        <property name="name" value="historyOneSecondUpdateJob"/>
         <property name="group" value="history"/>
-        <property name="durability" value="true" />
+        <property name="durability" value="true"/>
         <property name="requestsRecovery" value="true"/>
         <property name="jobDataAsMap">
             <map>
@@ -27,14 +26,81 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
                 <entry key="startDate" value="${history.interval.second.start.date}"/>
                 <entry key="symbolList" value="${symbol.list}"/>
                 <entry key="maxDataPoints" value="${history.interval.maxDataPoints}"/>
+                <entry key="updateMode" value="${history.interval.update.mode}"/>
             </map>
         </property>
     </bean>
 
-    <bean id="historyIntervalTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-        <property name="jobDetail" ref="historyIntervalUpdateJob"/>
-        <property name="repeatInterval" value="2000"/>
+    <bean name="historyFiveSecondUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.tws.repository.job.HistorySecondUpdateJob"/>
+        <property name="name" value="historyFiveSecondUpdateJob"/>
+        <property name="group" value="history"/>
+        <property name="durability" value="true"/>
+        <property name="requestsRecovery" value="true"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="interval" value="${history.interval.five.second}"/>
+                <entry key="startDate" value="${history.interval.second.start.date}"/>
+                <entry key="symbolList" value="${symbol.list}"/>
+                <entry key="maxDataPoints" value="${history.interval.maxDataPoints}"/>
+                <entry key="updateMode" value="${history.interval.update.mode}"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="historyOneMinuteUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.tws.repository.job.HistorySecondUpdateJob"/>
+        <property name="name" value="historyOneMinuteUpdateJob"/>
+        <property name="group" value="history"/>
+        <property name="durability" value="true"/>
+        <property name="requestsRecovery" value="true"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="interval" value="${history.interval.one.minute}"/>
+                <entry key="startDate" value="${history.interval.minute.start.date}"/>
+                <entry key="symbolList" value="${symbol.list}"/>
+                <entry key="maxDataPoints" value="${history.interval.maxDataPoints}"/>
+                <entry key="updateMode" value="${history.interval.update.mode}"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="historyOneDayUpdateJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.tws.repository.job.HistorySecondUpdateJob"/>
+        <property name="name" value="historyOneDayUpdateJob"/>
+        <property name="group" value="history"/>
+        <property name="durability" value="true"/>
+        <property name="requestsRecovery" value="true"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="interval" value="${history.interval.one.day}"/>
+                <entry key="startDate" value="${history.interval.day.start.date}"/>
+                <entry key="symbolList" value="${symbol.list}"/>
+                <entry key="maxDataPoints" value="${history.interval.maxDataPoints}"/>
+                <entry key="updateMode" value="${history.interval.update.mode}"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="historyOneSecondTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="historyOneSecondUpdateJob"/>
+        <property name="repeatInterval" value="1000"/>
         <property name="startDelay" value="1000"/>
+    </bean>
+    <bean id="historyFiveSecondTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="historyFiveSecondUpdateJob"/>
+        <property name="repeatInterval" value="2000"/>
+        <property name="startDelay" value="2000"/>
+    </bean>
+    <bean id="historyOneMinuteTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="historyOneMinuteUpdateJob"/>
+        <property name="repeatInterval" value="5000"/>
+        <property name="startDelay" value="3000"/>
+    </bean>
+    <bean id="historyOneDayTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="historyOneDayUpdateJob"/>
+        <property name="repeatInterval" value="5000"/>
+        <property name="startDelay" value="4000"/>
     </bean>
 
     <bean id="autoWireSpringBeanJobFactory" class="com.tws.repository.AutowiringSpringBeanJobFactory"/>
@@ -42,7 +108,10 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="triggers">
             <list>
-                <ref bean="historyIntervalTrigger" />
+                <ref bean="historyOneSecondTrigger"/>
+                <ref bean="historyFiveSecondTrigger"/>
+                <ref bean="historyOneMinuteTrigger"/>
+                <!--<ref bean="historyOneDayTrigger"/>-->
             </list>
         </property>
         <property name="jobFactory" ref="autoWireSpringBeanJobFactory"/>
@@ -67,15 +136,15 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     </bean>
 
     <!--<rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >-->
-        <!--<rabbit:bindings>-->
-            <!--<rabbit:binding pattern="HI.#" queue="REPOSITORY.HISTORY.HI" />-->
-        <!--</rabbit:bindings>-->
+    <!--<rabbit:bindings>-->
+    <!--<rabbit:binding pattern="HI.#" queue="REPOSITORY.HISTORY.HI" />-->
+    <!--</rabbit:bindings>-->
     <!--</rabbit:topic-exchange>-->
 
     <!--<rabbit:queue auto-declare="true" name="REPOSITORY.HISTORY.HI" durable="false" auto-delete="true" />-->
 
     <!--<rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >-->
-        <!--<rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="REPOSITORY.HISTORY.HI" />-->
+    <!--<rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="REPOSITORY.HISTORY.HI" />-->
     <!--</rabbit:listener-container>-->
 
     <!--<bean id="historyIntervalListener" class="com.tws.repository.listener.HistoryIntervalListener" />-->

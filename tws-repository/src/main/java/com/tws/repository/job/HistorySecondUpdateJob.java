@@ -1,7 +1,9 @@
 package com.tws.repository.job;
 
 import com.tws.repository.GlobalQueues;
+import com.tws.repository.service.HistoryIntervalStoreService;
 import com.tws.repository.service.HistoryIntervalUpdateService;
+import com.tws.repository.service.UpdateMode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -30,16 +32,18 @@ public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob
     private int interval;
     private int maxDataPoints;
     private List<String> symbolList;
+    private UpdateMode mode;
 
     @Autowired
     private HistoryIntervalUpdateService dbUpdateService;
 
 
-    private void init(JobDataMap map) {
+    private void init(JobDataMap map, JobKey jobKey) {
         String intervalString = map.getString("interval");
         String startString = map.getString("startDate");
         String symbolString = map.getString("symbolList");
         String maxDataPointsString = map.getString("maxDataPoints");
+        String updateModeString = map.getString("updateMode");
 
         symbolList = new LinkedList<>();
         StringTokenizer tokenizer = new StringTokenizer(symbolString, ",");
@@ -52,28 +56,38 @@ public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob
         startDate = localDateTime.atZone(ZoneId.of("America/New_York"));
         interval = NumberUtils.toInt(intervalString);
         maxDataPoints = NumberUtils.toInt(maxDataPointsString);
+        mode = UpdateMode.valueOf(updateModeString);
 
 
-        logger.info("History Second interval update job init: ");
-        logger.info("start: {}", startString);
-        logger.info("interval: {}", interval);
-        logger.info("max data points: {}", maxDataPoints);
-        logger.info("symbol list: {}", symbolList);
+        logger.debug("History interval update job init: ");
+        logger.debug("job name and group: {}", jobKey);
+        logger.debug("start: {}", startString);
+        logger.debug("interval: {}", interval);
+        logger.debug("max data points: {}", maxDataPoints);
+        logger.debug("symbol list: {}", symbolList);
+        logger.debug("update mode: {}", mode);
     }
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        if (!GlobalQueues.historyIntervals.isEmpty()) {
-            return;
-        }
-        JobKey jobKey = context.getJobDetail().getKey();
-        logger.info("start run job: {}", jobKey);
+        try {
+            JobKey jobKey = context.getJobDetail().getKey();
+            logger.info("Start run job: {}", jobKey);
 
-        JobDataMap map = context.getJobDetail().getJobDataMap();
-        init(map);
+            JobDataMap map = context.getJobDetail().getJobDataMap();
+            init(map, jobKey);
 
-        for (String symbol : symbolList) {
-            dbUpdateService.update(map, symbol, interval, startDate.toInstant().toEpochMilli(), maxDataPoints);
+            for (String symbol : symbolList) {
+                do {
+                    Thread.sleep(100);
+                }while (System.currentTimeMillis() - HistoryIntervalStoreService.lastUpdateTime < 500);
+                dbUpdateService.update(map, symbol, interval, startDate.toInstant().toEpochMilli(), maxDataPoints);
+            }
+        } catch (Exception e) {
+            JobExecutionException jobExecutionException = new JobExecutionException(e);
+            jobExecutionException.setRefireImmediately(true);
+            logger.error("[SEVERE] job execution error. will refire immediately", e);
+            throw jobExecutionException;
         }
     }
 }

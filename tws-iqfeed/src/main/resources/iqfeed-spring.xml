@@ -10,6 +10,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <context:property-placeholder location="classpath:*.properties"/>
     <context:component-scan base-package="com.tws.iqfeed"/>
     <import resource="classpath:message-spring.xml"/>
+    <import resource="classpath:cassandra-spring.xml"/>
 
     <bean id="level1Pool" class="com.tws.iqfeed.netty.ConnectionPool">
         <property name="host" value="${iqfeed.host}"/>
