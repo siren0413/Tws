@@ -16,4 +16,5 @@ import java.util.concurrent.TimeUnit;
 public class GlobalQueues {
     public static BlockingQueue<String> symbolQueue = new LinkedBlockingDeque<>();
     public static BlockingQueue<HistoryInterval> historyIntervals = new LinkedBlockingDeque<>();
+    public static Cache<String, String> responseCache = CacheBuilder.newBuilder().expireAfterWrite(60, TimeUnit.SECONDS).build();
 }

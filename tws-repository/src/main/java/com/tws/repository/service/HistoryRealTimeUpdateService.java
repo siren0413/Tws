@@ -22,9 +22,9 @@ import java.util.Map;
  * Created by admin on 2/16/2016.
  */
 
-public class HistoryIntervalUpdateService {
+public class HistoryRealTimeUpdateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(HistoryIntervalUpdateService.class);
+    private static final Logger logger = LoggerFactory.getLogger(HistoryRealTimeUpdateService.class);
 
     @Autowired
     private HistoryIntervalRepository historyIntervalRepository;
@@ -35,28 +35,20 @@ public class HistoryIntervalUpdateService {
     @Autowired
     private ActivemqPublisher publisher;
 
-    public void update(JobDataMap map, String symbol, int interval, long startTime, int maxDataPoints) {
-
-
-//        HistoryIntervalDB historyIntervalDB = historyIntervalRepository.getMostRecentRecordInTime(symbol, interval);
-//        logger.info("query getMostRecentRecordInTime, result: {}", historyIntervalDB);
-//        long mostRecentTime;
-//        if (historyIntervalDB == null) {
-//            mostRecentTime = startTime;
-//        } else {
-//            mostRecentTime = Long.max(historyIntervalDB.getTime(), startTime);
-//        }
+    public void update(JobDataMap map, String symbol, int interval, int maxDataPoints) {
 
         // determine start time
-        ZonedDateTime startZonedDateTime;
-        Map<String, Object> wrapperMap = map.getWrappedMap();
-        ZonedDateTime lastEndZonedDateTime = (ZonedDateTime) wrapperMap.get(symbol);
-        if (lastEndZonedDateTime == null) {
-            Instant instant = Instant.ofEpochMilli(startTime);
-            startZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
-        } else {
-            startZonedDateTime = lastEndZonedDateTime;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
+        HistoryIntervalDB historyIntervalDB = historyIntervalRepository.getMostRecentRecordInTime(symbol, interval);
+        logger.info("query getMostRecentRecordInTime, result: {}", historyIntervalDB);
+        if (historyIntervalDB == null) {
+            logger.error("history data not found, please update db data first.");
+            return;
         }
+
+        long startTime = historyIntervalDB.getTime();
+        Instant instant = Instant.ofEpochMilli(startTime);
+        ZonedDateTime startZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
 
         // adjust start time to skip 20pm-4am and SAT-SUN
         startZonedDateTime = adjustStartTime(startZonedDateTime);
@@ -65,17 +57,14 @@ public class HistoryIntervalUpdateService {
         startZonedDateTime = startZonedDateTime.minusSeconds(interval);
         ZonedDateTime endZonedDateTime = startZonedDateTime.plusSeconds(interval * maxDataPoints);
 
+        // format start and end time
+        String beginTime = startZonedDateTime.format(formatter);
+        String endTime = endZonedDateTime.format(formatter);
 
         String cmd = "";
         if (interval < 86400) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
-            String beginTime = startZonedDateTime.format(formatter);
-            String endTime = endZonedDateTime.format(formatter);
             cmd = historyCommandService.getTickIntervalCmd(symbol, interval, beginTime, endTime);
         } else {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-            String beginTime = startZonedDateTime.format(formatter);
-            String endTime = endZonedDateTime.format(formatter);
             cmd = historyCommandService.getDayIntervalCmd(symbol, interval, beginTime, endTime);
         }
         logger.info("send history command: {}", cmd);
@@ -84,12 +73,11 @@ public class HistoryIntervalUpdateService {
         responseMap.put(requestId, "");
         publisher.publish(Constants.HISTORY_COMMAND_ROUTEKEY_PREFIX, cmd);
 
-        // only wait for 30 seconds for the response
+        // only wait for 20 seconds for the response
         long start = System.currentTimeMillis();
-        while (System.currentTimeMillis() - start < 30000) {
+        while (System.currentTimeMillis() - start < 10000) {
             if (responseMap.get(requestId) == null) {
-                wrapperMap.put(symbol, endZonedDateTime);
-                return;
+                break;
             }
             try {
                 Thread.sleep(1);
@@ -117,7 +105,7 @@ public class HistoryIntervalUpdateService {
                 modified = true;
             }
 
-            if(startZonedDateTime.isAfter(ZonedDateTime.now(ZoneId.of("America/New_York")))){
+            if (startZonedDateTime.isAfter(ZonedDateTime.now(ZoneId.of("America/New_York")))) {
                 startZonedDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
                 break;
             }

@@ -4,6 +4,8 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-      <bean id="tickerMarshaller" class="com.tws.shared.ib.marshall.TickerMarshaller"/>
 
+      <bean id="zkClient" class="com.tws.shared.zookeeper.ZkClient">
+            <property name="zookeeperUrl" value="10.0.1.48:2181"/>
+      </bean>
 </beans>

@@ -1,6 +1,7 @@
 package com.tws.repository.job;
 
 import com.tws.repository.service.HistoryIntervalUpdateService;
+import com.tws.repository.service.HistoryRealTimeUpdateService;
 import com.tws.repository.service.UpdateMode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.*;
@@ -16,34 +17,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Created by admin on 2/17/2016.
  */
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
-public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob {
+public class HistoryRealTimeUpdateJob extends QuartzJobBean implements StatefulJob {
 
-    private static final Logger logger = LoggerFactory.getLogger(HistorySecondUpdateJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(HistoryRealTimeUpdateJob.class);
 
-    private ZonedDateTime startDate;
     private int interval;
     private int maxDataPoints;
     private List<String> symbolList;
-    private UpdateMode mode;
     private BlockingQueue<String> queue = new LinkedBlockingDeque<>();
 
     @Autowired
-    private HistoryIntervalUpdateService dbUpdateService;
+    private HistoryRealTimeUpdateService dbUpdateService;
 
 
     private void init(JobDataMap map, JobKey jobKey) {
         String intervalString = map.getString("interval");
-        String startString = map.getString("startDate");
         String symbolString = map.getString("symbolList");
         String maxDataPointsString = map.getString("maxDataPoints");
-        String updateModeString = map.getString("updateMode");
 
         symbolList = new LinkedList<>();
         StringTokenizer tokenizer = new StringTokenizer(symbolString, ",");
@@ -56,21 +56,14 @@ public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob
             }
         }
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
-        LocalDateTime localDateTime = LocalDateTime.parse(startString, dtf);
-        startDate = localDateTime.atZone(ZoneId.of("America/New_York"));
         interval = NumberUtils.toInt(intervalString);
         maxDataPoints = NumberUtils.toInt(maxDataPointsString);
-        mode = UpdateMode.valueOf(updateModeString);
-
 
         logger.info("History interval update job init: ");
         logger.info("job name and group: {}", jobKey);
-        logger.info("start: {}", startString);
         logger.info("interval: {}", interval);
         logger.info("max data points: {}", maxDataPoints);
         logger.info("symbol list: {}", symbolList);
-        logger.info("update mode: {}", mode);
     }
 
     @Override
@@ -82,7 +75,7 @@ public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob
             JobDataMap map = context.getJobDetail().getJobDataMap();
             init(map, jobKey);
 
-            ExecutorService executor = Executors.newFixedThreadPool(5);
+            ExecutorService executor = Executors.newFixedThreadPool(20);
 
             while (true) {
                 String symbol = queue.take();
@@ -110,9 +103,9 @@ public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob
         @Override
         public void run() {
             try {
-                dbUpdateService.update(map, symbol, interval, startDate.toInstant().toEpochMilli(), maxDataPoints);
+                dbUpdateService.update(map, symbol, interval,  maxDataPoints);
             } catch (Exception e) {
-                logger.error("[SEVERE] error update, symbol: {}, interval: {}, startDate: {} ", symbol, interval, startDate);
+                logger.error("[SEVERE] error update, symbol: {}, interval: {} ", symbol, interval);
             } finally {
                 try {
                     queue.put(symbol);

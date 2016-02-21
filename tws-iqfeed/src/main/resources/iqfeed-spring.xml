@@ -48,6 +48,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="handler">
             <list>
                 <bean class="com.tws.iqfeed.handler.history.HistoryErrorMessageHandler"/>
+                <bean class="com.tws.iqfeed.handler.history.HistoryCmdResponseMessageHandler"/>
                 <bean class="com.tws.iqfeed.handler.history.HistoryIntervalMessageHandler"/>
                 <bean class="com.tws.iqfeed.handler.history.HistoryTickMessageHandler"/>
                 <bean class="com.tws.iqfeed.handler.history.HistoryUnsupportedMessageHandler"/>
@@ -74,11 +75,6 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
             <bean class="com.tws.iqfeed.listener.HistoryCommandListener"/>
         </property>
     </bean>
-
-
-
-
-
 
     <!--<rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >-->
         <!--<rabbit:bindings>-->

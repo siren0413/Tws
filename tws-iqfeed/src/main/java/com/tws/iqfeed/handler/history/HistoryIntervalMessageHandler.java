@@ -1,6 +1,7 @@
 package com.tws.iqfeed.handler.history;
 
 import com.tws.activemq.ActivemqPublisher;
+import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
 import com.tws.rabbitmq.RabbitmqPublisher;
 import com.tws.shared.iqfeed.model.HistoryInterval;
@@ -14,6 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 /**
@@ -54,6 +61,40 @@ public class HistoryIntervalMessageHandler extends SimpleChannelInboundHandler<L
             logger.error("Unsupported requestId: [{}]", requestId);
             return;
         }
-        publisher.publish(HISTORY_INTERVAL_ROUTEKEY_PREFIX, historyInterval);
+        save(historyInterval);
+//        publisher.publish(HISTORY_INTERVAL_ROUTEKEY_PREFIX, historyInterval);
+    }
+
+    private void save(HistoryInterval historyInterval) {
+        HistoryIntervalDB historyIntervalDB = new HistoryIntervalDB();
+        String[] parts = historyInterval.getRequestId().split("\\.");
+        historyIntervalDB.setSymbol(parts[0]);
+        historyIntervalDB.setInterval(NumberUtils.toInt(parts[1]));
+        if (historyInterval.getTimestamp() == null) {
+            return;
+        }
+        ZonedDateTime zonedDateTime;
+        try {
+            LocalDateTime localDateTime = LocalDateTime.parse(historyInterval.getTimestamp().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            zonedDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
+        } catch (DateTimeParseException e) {
+            try {
+                LocalDate localDate = LocalDate.parse(historyInterval.getTimestamp().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                zonedDateTime = localDate.atStartOfDay(ZoneId.of("America/New_York"));
+            } catch (DateTimeParseException e1) {
+                logger.error("unable to parse date: {}", historyInterval.getTimestamp(),e);
+                return;
+            }
+        }
+        historyIntervalDB.setTime(zonedDateTime.toInstant().toEpochMilli());
+        historyIntervalDB.setTimestamp(historyInterval.getTimestamp());
+        historyIntervalDB.setClose(historyInterval.getClose());
+        historyIntervalDB.setHigh(historyInterval.getHigh());
+        historyIntervalDB.setLow(historyInterval.getLow());
+        historyIntervalDB.setNumTrades(historyInterval.getNumTrades());
+        historyIntervalDB.setOpen(historyInterval.getOpen());
+        historyIntervalDB.setPeriodVolume(historyInterval.getPeriodVolume());
+        historyIntervalDB.setTotalVolume(historyInterval.getTotalVolume());
+        repository.saveIntervalInTimeAsync(historyIntervalDB);
     }
 }

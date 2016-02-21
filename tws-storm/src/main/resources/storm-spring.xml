@@ -12,40 +12,47 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <import resource="classpath:shared-spring.xml"/>
     <import resource="classpath:message-spring.xml"/>
 
-    <rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >
-        <rabbit:listener ref="level1SummaryListener" method="onMessageReceived" queues="STORM.LEVEL1.SUMMARY" />
-        <rabbit:listener ref="level1UpdateListener" method="onMessageReceived" queues="STORM.LEVEL1.UPDATE" />
-        <rabbit:listener ref="level1TimeListener" method="onMessageReceived" queues="STORM.LEVEL1.TIME" />
-        <rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="STORM.HISTORY.HI" />
-    </rabbit:listener-container>
+    <!--<rabbit:listener-container connection-factory="connectionFactory" auto-declare="true" acknowledge="none" max-concurrency="5" >-->
+        <!--<rabbit:listener ref="level1SummaryListener" method="onMessageReceived" queues="STORM.LEVEL1.SUMMARY" />-->
+        <!--<rabbit:listener ref="level1UpdateListener" method="onMessageReceived" queues="STORM.LEVEL1.UPDATE" />-->
+        <!--<rabbit:listener ref="level1TimeListener" method="onMessageReceived" queues="STORM.LEVEL1.TIME" />-->
+        <!--<rabbit:listener ref="historyIntervalListener" method="onMessageReceived" queues="STORM.HISTORY.HI" />-->
+    <!--</rabbit:listener-container>-->
 
-    <!-- level 1 -->
-    <rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="true" >
-        <rabbit:bindings>
-            <rabbit:binding pattern="T.#" queue="STORM.LEVEL1.TIME" />
-            <rabbit:binding pattern="P.#" queue="STORM.LEVEL1.SUMMARY" />
-            <rabbit:binding pattern="Q.#" queue="STORM.LEVEL1.UPDATE" />
-        </rabbit:bindings>
-    </rabbit:topic-exchange>
+    <!--&lt;!&ndash; level 1 &ndash;&gt;-->
+    <!--<rabbit:topic-exchange name="LEVEL1" auto-declare="true" durable="true" >-->
+        <!--<rabbit:bindings>-->
+            <!--<rabbit:binding pattern="T.#" queue="STORM.LEVEL1.TIME" />-->
+            <!--<rabbit:binding pattern="P.#" queue="STORM.LEVEL1.SUMMARY" />-->
+            <!--<rabbit:binding pattern="Q.#" queue="STORM.LEVEL1.UPDATE" />-->
+        <!--</rabbit:bindings>-->
+    <!--</rabbit:topic-exchange>-->
 
-    <rabbit:queue auto-declare="true" name="STORM.LEVEL1.SUMMARY" durable="false" auto-delete="true" />
-    <rabbit:queue auto-declare="true" name="STORM.LEVEL1.UPDATE" durable="false" auto-delete="true" />
-    <rabbit:queue auto-declare="true" name="STORM.LEVEL1.TIME" durable="false" auto-delete="true" />
+    <!--<rabbit:queue auto-declare="true" name="STORM.LEVEL1.SUMMARY" durable="false" auto-delete="true" />-->
+    <!--<rabbit:queue auto-declare="true" name="STORM.LEVEL1.UPDATE" durable="false" auto-delete="true" />-->
+    <!--<rabbit:queue auto-declare="true" name="STORM.LEVEL1.TIME" durable="false" auto-delete="true" />-->
 
-    <bean id="level1SummaryListener" class="com.tws.storm.listener.Level1SummaryListener"/>
-    <bean id="level1UpdateListener" class="com.tws.storm.listener.Level1UpdateListener"/>
-    <bean id="level1TimeListener" class="com.tws.storm.listener.Level1TimeListener"/>
+    <!--<bean id="level1SummaryListener" class="com.tws.storm.listener.Level1SummaryListener"/>-->
+    <!--<bean id="level1UpdateListener" class="com.tws.storm.listener.Level1UpdateListener"/>-->
+    <!--<bean id="level1TimeListener" class="com.tws.storm.listener.Level1TimeListener"/>-->
 
-    <!-- history -->
-    <rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >
-        <rabbit:bindings>
-            <rabbit:binding pattern="HI.#" queue="STORM.HISTORY.HI" />
-        </rabbit:bindings>
-    </rabbit:topic-exchange>
+    <!--&lt;!&ndash; history &ndash;&gt;-->
+    <!--<rabbit:topic-exchange name="HISTORY" auto-declare="true" durable="true" >-->
+        <!--<rabbit:bindings>-->
+            <!--<rabbit:binding pattern="HI.#" queue="STORM.HISTORY.HI" />-->
+        <!--</rabbit:bindings>-->
+    <!--</rabbit:topic-exchange>-->
 
-    <rabbit:queue auto-declare="true" name="STORM.HISTORY.HI" durable="false" auto-delete="true" />
+    <!--<rabbit:queue auto-declare="true" name="STORM.HISTORY.HI" durable="false" auto-delete="true" />-->
 
-    <bean id="historyIntervalListener" class="com.tws.storm.listener.HistoryIntervalListener" />
+    <!--<bean id="historyIntervalListener" class="com.tws.storm.listener.HistoryIntervalListener" />-->
+
+
+    
+
+
+
+
 
 
 </beans>
