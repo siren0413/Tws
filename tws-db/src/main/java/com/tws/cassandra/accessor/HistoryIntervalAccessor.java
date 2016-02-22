@@ -15,7 +15,7 @@ import com.tws.cassandra.model.HistoryIntervalDB;
 @Accessor
 public interface HistoryIntervalAccessor {
 
-    @Query("SELECT * FROM history.time WHERE symbol = :symbol AND interval = :interval AND time >= :start AND time <= :end")
+    @Query("SELECT * FROM history.time WHERE symbol = :symbol AND interval = :interval AND time >= :start AND time <= :end ORDER BY time ASC ALLOW FILTERING")
     @QueryParameters(consistency = "ONE")
     ListenableFuture<Result<HistoryIntervalDB>> getIntervalInTime(@Param("symbol") String symbol, @Param("interval") int interval, @Param("start") long start, @Param("end") long end);
 

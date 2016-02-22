@@ -132,4 +132,24 @@ public class Level1Update implements Serializable {
     public void setOpen(float open) {
         this.open = open;
     }
+
+    @Override
+    public String toString() {
+        return "Level1Update{" +
+                "symbol='" + symbol + '\'' +
+                ", bid=" + bid +
+                ", bidSize=" + bidSize +
+                ", bidTime='" + bidTime + '\'' +
+                ", ask=" + ask +
+                ", askSize=" + askSize +
+                ", askTime='" + askTime + '\'' +
+                ", last=" + last +
+                ", lastSize=" + lastSize +
+                ", lastTime='" + lastTime + '\'' +
+                ", totalVolume=" + totalVolume +
+                ", low=" + low +
+                ", high=" + high +
+                ", open=" + open +
+                '}';
+    }
 }

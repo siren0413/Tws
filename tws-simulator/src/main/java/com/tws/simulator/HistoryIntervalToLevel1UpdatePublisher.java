@@ -4,6 +4,8 @@ import com.tws.activemq.ActivemqPublisher;
 import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.shared.iqfeed.model.Level1Update;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -24,13 +26,13 @@ public class HistoryIntervalToLevel1UpdatePublisher implements Runnable {
         level1Update.setSymbol(historyIntervalDB.getSymbol());
         level1Update.setBid(historyIntervalDB.getClose());
         level1Update.setBidSize(0);
-        level1Update.setBidTime("");
+        level1Update.setBidTime(historyIntervalDB.getTimestamp());
         level1Update.setAsk(historyIntervalDB.getClose());
         level1Update.setAskSize(0);
-        level1Update.setAskTime("");
+        level1Update.setAskTime(historyIntervalDB.getTimestamp());
         level1Update.setLast(historyIntervalDB.getClose());
         level1Update.setLastSize(0);
-        level1Update.setLastTime("");
+        level1Update.setLastTime(historyIntervalDB.getTimestamp());
         level1Update.setTotalVolume(historyIntervalDB.getTotalVolume());
         level1Update.setOpen(historyIntervalDB.getOpen());
         level1Update.setLow(historyIntervalDB.getLow());
@@ -41,12 +43,10 @@ public class HistoryIntervalToLevel1UpdatePublisher implements Runnable {
     @Override
     public void run() {
         while (!Global.dbQueue.isEmpty()) {
-            try {
-                HistoryIntervalDB historyIntervalDB = Global.dbQueue.take();
+            HistoryIntervalDB historyIntervalDB = Global.dbQueue.poll();
+            if (historyIntervalDB != null) {
                 Level1Update level1Update = convertHistoryIntervalDBToLevel1Update(historyIntervalDB);
                 publisher.publish("Q", level1Update);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
     }
