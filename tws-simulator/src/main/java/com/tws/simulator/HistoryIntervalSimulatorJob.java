@@ -3,6 +3,7 @@ package com.tws.simulator;
 import com.tws.activemq.ActivemqPublisher;
 import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
     private long startTime;
     private long endTime;
     private List<String> symbolList;
+    private int dataPoints;
     private final PriorityBlockingQueue<HistoryIntervalDB> queue = new PriorityBlockingQueue<>();
 
     @Autowired
@@ -46,7 +48,9 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
         String startTimeString = map.getString("startTime");
         String endTimeString = map.getString("endTime");
         String symbolString = map.getString("symbolList");
+        String dataPointsString = map.getString("dataPoints");
 
+        dataPoints = NumberUtils.toInt(dataPointsString);
         symbolList = new LinkedList<>();
         StringTokenizer tokenizer = new StringTokenizer(symbolString, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -57,9 +61,9 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
         LocalDateTime localDateTime = LocalDateTime.parse(startTimeString, dtf);
         ZonedDateTime startDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
         startTime = startDateTime.toInstant().toEpochMilli();
-        if(endTimeString == null){
+        if (endTimeString == null) {
             endTime = -1;
-        }else{
+        } else {
             LocalDateTime endLocalDateTime = LocalDateTime.parse(endTimeString, dtf);
             ZonedDateTime endDateTime = endLocalDateTime.atZone(ZoneId.of("America/New_York"));
             endTime = endDateTime.toInstant().toEpochMilli();
@@ -82,14 +86,14 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
 
         // scan
         ExecutorService scannerExecutor = Executors.newFixedThreadPool(10);
-        for(String symbol: symbolList){
-            scannerExecutor.submit(new HistoryIntervalScanner(startTime,endTime,symbol,repository));
+        for (String symbol : symbolList) {
+            scannerExecutor.submit(new HistoryIntervalScanner(map,startTime, endTime, symbol, dataPoints, repository));
         }
 
         // publish
         int num = 10;
         ExecutorService publisherExecutor = Executors.newFixedThreadPool(num);
-        for(int i = 0; i < num; i++){
+        for (int i = 0; i < num; i++) {
             publisherExecutor.submit(new HistoryIntervalToLevel1UpdatePublisher(publisher, queue));
         }
 
@@ -98,8 +102,9 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
             scannerExecutor.shutdown();
             scannerExecutor.awaitTermination(60, TimeUnit.SECONDS);
 
-            publisherExecutor.shutdown();
-            publisherExecutor.awaitTermination(60, TimeUnit.SECONDS);
+            if(Global.dbQueue.isEmpty()){
+                publisherExecutor.shutdownNow();
+            }
 
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -1,8 +1,6 @@
 package com.tws.repository.job;
 
-import com.tws.repository.service.HistoryIntervalUpdateService;
 import com.tws.repository.service.HistoryRealTimeUpdateService;
-import com.tws.repository.service.UpdateMode;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -10,12 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;

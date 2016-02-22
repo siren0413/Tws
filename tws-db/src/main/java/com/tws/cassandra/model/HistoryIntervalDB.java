@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 
 @Table(keyspace = "history", name = "time")
-public class HistoryIntervalDB implements Serializable{
+public class HistoryIntervalDB implements Serializable, Comparable{
 
     @PartitionKey(0)
     private String symbol;
@@ -129,5 +129,11 @@ public class HistoryIntervalDB implements Serializable{
                 ", periodVolume=" + periodVolume +
                 ", numTrades=" + numTrades +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        HistoryIntervalDB other = (HistoryIntervalDB) o;
+        return Long.valueOf(this.getTime()).compareTo(other.getTime());
     }
 }

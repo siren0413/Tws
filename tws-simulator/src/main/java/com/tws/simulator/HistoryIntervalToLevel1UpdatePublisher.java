@@ -12,7 +12,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 public class HistoryIntervalToLevel1UpdatePublisher implements Runnable {
 
     private ActivemqPublisher publisher;
-    private PriorityBlockingQueue<HistoryIntervalDB> queue = new PriorityBlockingQueue<>();
+    private PriorityBlockingQueue<HistoryIntervalDB> queue;
 
     public HistoryIntervalToLevel1UpdatePublisher(ActivemqPublisher publisher, PriorityBlockingQueue<HistoryIntervalDB> queue) {
         this.publisher = publisher;
@@ -40,9 +40,9 @@ public class HistoryIntervalToLevel1UpdatePublisher implements Runnable {
 
     @Override
     public void run() {
-        while (!queue.isEmpty()) {
+        while (!Global.dbQueue.isEmpty()) {
             try {
-                HistoryIntervalDB historyIntervalDB = queue.take();
+                HistoryIntervalDB historyIntervalDB = Global.dbQueue.take();
                 Level1Update level1Update = convertHistoryIntervalDBToLevel1Update(historyIntervalDB);
                 publisher.publish("Q", level1Update);
             } catch (InterruptedException e) {

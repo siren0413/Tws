@@ -7,7 +7,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
-    <context:property-placeholder location="classpath:*.properties"/>
+    <context:property-placeholder location="classpath*:*.properties"/>
     <context:component-scan base-package="com.tws.iqfeed"/>
     <import resource="classpath:message-spring.xml"/>
     <import resource="classpath:cassandra-spring.xml"/>

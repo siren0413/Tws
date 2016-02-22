@@ -10,5 +10,5 @@ import java.util.concurrent.PriorityBlockingQueue;
  * Created by admin on 2/21/2016.
  */
 public class Global {
-    public static final PriorityBlockingQueue<HistoryIntervalDB> dbQueue = new PriorityBlockingQueue<>(100000);
+    public static final PriorityBlockingQueue<HistoryIntervalDB> dbQueue = new PriorityBlockingQueue<>();
 }
