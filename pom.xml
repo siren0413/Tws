@@ -18,6 +18,7 @@
         <module>tws-shared</module>
         <module>tws-iqfeed</module>
         <module>tws-message</module>
+        <module>tws-simulator</module>
     </modules>
 
     <properties>

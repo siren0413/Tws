@@ -48,8 +48,28 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
     <!--<bean id="historyIntervalListener" class="com.tws.storm.listener.HistoryIntervalListener" />-->
 
 
-    
 
+    <bean id="level1UpdateListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="autoStartup" value="true"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="sessionTransacted" value="false"/>
+        <property name="destinationName" value="Q"/>
+        <property name="messageListener">
+            <bean class="com.tws.storm.listener.Level1UpdateListener"/>
+        </property>
+    </bean>
+
+    <bean id="level1SummaryListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="jmsConnectionFactory"/>
+        <property name="autoStartup" value="true"/>
+        <property name="pubSubDomain" value="true"/>
+        <property name="sessionTransacted" value="false"/>
+        <property name="destinationName" value="P"/>
+        <property name="messageListener">
+            <bean class="com.tws.storm.listener.Level1SummaryListener"/>
+        </property>
+    </bean>
 
 
 

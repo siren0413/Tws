@@ -47,7 +47,7 @@ public class Level1SummaryMessageHandler extends SimpleChannelInboundHandler<Lis
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_SUMMARY_ROUTEKEY_PREFIX, (Serializable)list);
+            publisher.publish(LEVEL1_SUMMARY_ROUTEKEY_PREFIX, level1Summary);
 //            publisher.publish(LEVEL1_EXCHANGE, String.join(ROUTEKEY_DELIMETER, LEVEL1_SUMMARY_ROUTEKEY_PREFIX, level1Summary.getSymbol()), level1Summary);
         } else {
             ctx.fireChannelRead(list);

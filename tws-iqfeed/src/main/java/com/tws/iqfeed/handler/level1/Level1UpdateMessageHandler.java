@@ -47,7 +47,7 @@ public class Level1UpdateMessageHandler extends SimpleChannelInboundHandler<List
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_UPDATE_ROUTEKEY_PREFIX, (Serializable)list);
+            publisher.publish(LEVEL1_UPDATE_ROUTEKEY_PREFIX, level1Update);
         } else {
             ctx.fireChannelRead(list);
         }

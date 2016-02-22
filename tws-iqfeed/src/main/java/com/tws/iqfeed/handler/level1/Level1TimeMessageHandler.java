@@ -33,7 +33,7 @@ public class Level1TimeMessageHandler extends SimpleChannelInboundHandler<List<S
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX, (Serializable)list);
+            publisher.publish(LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX, level1Timestamp);
         }else{
             ctx.fireChannelRead(list);
         }

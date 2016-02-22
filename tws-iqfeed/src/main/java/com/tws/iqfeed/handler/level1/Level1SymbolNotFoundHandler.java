@@ -19,7 +19,6 @@ public class Level1SymbolNotFoundHandler extends SimpleChannelInboundHandler<Lis
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
         if ("n".equals(list.get(0))) {
-            System.out.println(list);
             logger.error("Symbol not found: {}", list);
         }else{
             ctx.fireChannelRead(list);

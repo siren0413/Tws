@@ -33,7 +33,6 @@ public class HistoryRealTimeUpdateJob extends QuartzJobBean implements StatefulJ
 
     private int interval;
     private int maxDataPoints;
-    private List<String> symbolList;
     private BlockingQueue<String> queue = new LinkedBlockingDeque<>();
 
     @Autowired
@@ -45,7 +44,6 @@ public class HistoryRealTimeUpdateJob extends QuartzJobBean implements StatefulJ
         String symbolString = map.getString("symbolList");
         String maxDataPointsString = map.getString("maxDataPoints");
 
-        symbolList = new LinkedList<>();
         StringTokenizer tokenizer = new StringTokenizer(symbolString, ",");
         while (tokenizer.hasMoreTokens()) {
             try {
@@ -63,7 +61,6 @@ public class HistoryRealTimeUpdateJob extends QuartzJobBean implements StatefulJ
         logger.info("job name and group: {}", jobKey);
         logger.info("interval: {}", interval);
         logger.info("max data points: {}", maxDataPoints);
-        logger.info("symbol list: {}", symbolList);
     }
 
     @Override

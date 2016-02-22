@@ -6,6 +6,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
 import com.tws.storm.TestSpout;
+import com.tws.storm.spout.Level1SummarySpout;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import storm.trident.TridentTopology;
@@ -24,7 +25,7 @@ public class App
         conf.setNumWorkers(2);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("history", new TestSpout(), 5);
+        builder.setSpout("level1Summary", new Level1SummarySpout(), 5);
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("test", conf, builder.createTopology());
