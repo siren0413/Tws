@@ -6,6 +6,7 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
 import com.tws.storm.TestSpout;
+import com.tws.storm.bolt.Level1IntervalFilterBolt;
 import com.tws.storm.spout.Level1SummarySpout;
 import com.tws.storm.spout.Level1UpdateSpout;
 import org.springframework.context.ApplicationContext;
@@ -26,8 +27,9 @@ public class StormApp
         conf.setNumWorkers(2);
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("level1Summary", new Level1SummarySpout(), 5);
-        builder.setSpout("level1Update", new Level1UpdateSpout(), 5);
+        builder.setSpout("C_LEVEL1_SUMMARY_SPOUT", new Level1SummarySpout(), 5);
+        builder.setSpout("C_LEVEL1_UPDATE_SPOUT", new Level1UpdateSpout(), 5);
+        builder.setBolt("C_LEVEL1_ONE_SEC_BOLT", new Level1IntervalFilterBolt()).fieldsGrouping("C_LEVEL1_UPDATE_SPOUT","S_LEVEL1_UPDATE",new Fields("symbol"));
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("test", conf, builder.createTopology());

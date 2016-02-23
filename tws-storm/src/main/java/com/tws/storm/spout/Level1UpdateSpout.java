@@ -23,7 +23,7 @@ import static com.tws.shared.Constants.OPEN;
  */
 public class Level1UpdateSpout extends BaseRichSpout {
 
-    private static final String STREAM_ID = "level1_update";
+    private static final String STREAM_ID = "S_LEVEL1_UPDATE";
     public static BlockingQueue<Level1Update> queue = new LinkedBlockingDeque<>();
     private SpoutOutputCollector collector;
 
