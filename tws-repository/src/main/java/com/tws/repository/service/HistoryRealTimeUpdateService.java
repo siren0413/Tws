@@ -38,7 +38,6 @@ public class HistoryRealTimeUpdateService {
     public void update(JobDataMap map, String symbol, int interval, int maxDataPoints) {
 
         // determine start time
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
         HistoryIntervalDB historyIntervalDB = historyIntervalRepository.getMostRecentRecordInTime(symbol, interval);
         logger.info("query getMostRecentRecordInTime, result: {}", historyIntervalDB);
         if (historyIntervalDB == null) {
@@ -58,13 +57,16 @@ public class HistoryRealTimeUpdateService {
         ZonedDateTime endZonedDateTime = startZonedDateTime.plusSeconds(interval * maxDataPoints);
 
         // format start and end time
-        String beginTime = startZonedDateTime.format(formatter);
-        String endTime = endZonedDateTime.format(formatter);
+        String endTime="";
 
         String cmd = "";
         if (interval < 86400) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
+            String beginTime = startZonedDateTime.format(formatter);
             cmd = historyCommandService.getTickIntervalCmd(symbol, interval, beginTime, endTime);
         } else {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            String beginTime = startZonedDateTime.format(formatter);
             cmd = historyCommandService.getDayIntervalCmd(symbol, interval, beginTime, endTime);
         }
         logger.info("send history command: {}", cmd);

@@ -64,7 +64,7 @@ public class HistoryRealTimeUpdateJob extends QuartzJobBean implements StatefulJ
             JobDataMap map = context.getJobDetail().getJobDataMap();
             init(map, jobKey);
 
-            ExecutorService executor = Executors.newFixedThreadPool(20);
+            ExecutorService executor = Executors.newFixedThreadPool(5);
 
             while (true) {
                 String symbol = queue.take();

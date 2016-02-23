@@ -203,10 +203,10 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
                 <!--<ref bean="historyRealTimeOneMinuteTrigger"/>-->
                 <!--<ref bean="historyRealTimeOneDayTrigger"/>-->
 
-                <ref bean="historyOneSecondTrigger"/>
-                <ref bean="historyFiveSecondTrigger"/>
-                <ref bean="historyOneMinuteTrigger"/>
-                <ref bean="historyOneDayTrigger"/>
+                <!--<ref bean="historyOneSecondTrigger"/>-->
+                <!--<ref bean="historyFiveSecondTrigger"/>-->
+                <!--<ref bean="historyOneMinuteTrigger"/>-->
+                <!--<ref bean="historyOneDayTrigger"/>-->
             </list>
         </property>
         <property name="jobFactory" ref="autoWireSpringBeanJobFactory"/>

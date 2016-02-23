@@ -11,6 +11,5 @@ public class SimulatorApp
     public static void main( String[] args )
     {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("simulator-spring.xml");
-        context.registerShutdownHook();
     }
 }

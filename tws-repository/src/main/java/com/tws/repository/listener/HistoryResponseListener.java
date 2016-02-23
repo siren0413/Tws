@@ -32,8 +32,10 @@ public class HistoryResponseListener implements MessageListener {
                     if(map.containsKey(requestorId)){
                         map.remove(requestorId);
                         logger.info("Received response message for key: {}", requestorId);
-                        return;
+                    }else{
+                        logger.error("requestor id: [{}] not found in map.", requestorId);
                     }
+                    return;
                 }
             } catch (JMSException e) {
                 e.printStackTrace();
