@@ -16,10 +16,18 @@ public class Level1Summary implements Serializable {
     private float last;
     private int lastSize;
     private String lastTime;
+    private float extendedTrade;
+    private String extendedTradeDate;
+    private String extendedTradeTime;
+    private int extendedTradeSize;
     private int totalVolume;
     private float low;
     private float high;
     private float open;
+    private String messageContent;
+    private String exchangeId;
+    private int delay;
+    private String localDateTime;
 
     public String getSymbol() {
         return symbol;
@@ -131,5 +139,97 @@ public class Level1Summary implements Serializable {
 
     public void setOpen(float open) {
         this.open = open;
+    }
+
+    public float getExtendedTrade() {
+        return extendedTrade;
+    }
+
+    public void setExtendedTrade(float extendedTrade) {
+        this.extendedTrade = extendedTrade;
+    }
+
+    public String getExtendedTradeDate() {
+        return extendedTradeDate;
+    }
+
+    public void setExtendedTradeDate(String extendedTradeDate) {
+        this.extendedTradeDate = extendedTradeDate;
+    }
+
+    public String getExtendedTradeTime() {
+        return extendedTradeTime;
+    }
+
+    public void setExtendedTradeTime(String extendedTradeTime) {
+        this.extendedTradeTime = extendedTradeTime;
+    }
+
+    public int getExtendedTradeSize() {
+        return extendedTradeSize;
+    }
+
+    public void setExtendedTradeSize(int extendedTradeSize) {
+        this.extendedTradeSize = extendedTradeSize;
+    }
+
+    public String getMessageContent() {
+        return messageContent;
+    }
+
+    public void setMessageContent(String messageContent) {
+        this.messageContent = messageContent;
+    }
+
+    public String getExchangeId() {
+        return exchangeId;
+    }
+
+    public void setExchangeId(String exchangeId) {
+        this.exchangeId = exchangeId;
+    }
+
+    public int getDelay() {
+        return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+
+    public String getLocalDateTime() {
+        return localDateTime;
+    }
+
+    public void setLocalDateTime(String localDateTime) {
+        this.localDateTime = localDateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Level1Summary{" +
+                "symbol='" + symbol + '\'' +
+                ", bid=" + bid +
+                ", bidSize=" + bidSize +
+                ", bidTime='" + bidTime + '\'' +
+                ", ask=" + ask +
+                ", askSize=" + askSize +
+                ", askTime='" + askTime + '\'' +
+                ", last=" + last +
+                ", lastSize=" + lastSize +
+                ", lastTime='" + lastTime + '\'' +
+                ", extendedTrade=" + extendedTrade +
+                ", extendedTradeDate='" + extendedTradeDate + '\'' +
+                ", extendedTradeTime='" + extendedTradeTime + '\'' +
+                ", extendedTradeSize=" + extendedTradeSize +
+                ", totalVolume=" + totalVolume +
+                ", low=" + low +
+                ", high=" + high +
+                ", open=" + open +
+                ", messageContent='" + messageContent + '\'' +
+                ", exchangeId='" + exchangeId + '\'' +
+                ", delay=" + delay +
+                ", localDateTime='" + localDateTime + '\'' +
+                '}';
     }
 }

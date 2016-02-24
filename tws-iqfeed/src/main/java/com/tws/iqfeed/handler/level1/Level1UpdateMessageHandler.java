@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static com.tws.shared.Constants.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -39,10 +43,20 @@ public class Level1UpdateMessageHandler extends SimpleChannelInboundHandler<List
                 level1Update.setLast(NumberUtils.toFloat(list.get(i++)));
                 level1Update.setLastSize(NumberUtils.toInt(list.get(i++)));
                 level1Update.setLastTime(list.get(i++));
+                level1Update.setExtendedTrade(NumberUtils.toFloat(list.get(i++)));
+                level1Update.setExtendedTradeDate(list.get(i++));
+                level1Update.setExtendedTradeTime(list.get(i++));
+                level1Update.setExtendedTradeSize(NumberUtils.toInt(list.get(i++)));
                 level1Update.setTotalVolume(NumberUtils.toInt(list.get(i++)));
                 level1Update.setLow(NumberUtils.toFloat(list.get(i++)));
                 level1Update.setHigh(NumberUtils.toFloat(list.get(i++)));
                 level1Update.setOpen(NumberUtils.toFloat(list.get(i++)));
+                level1Update.setMessageContent(list.get(i++));
+                level1Update.setExchangeId(list.get(i++));
+                level1Update.setDelay(NumberUtils.toInt(list.get(i++)));
+                ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
+                String localDateTime = zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+                level1Update.setLocalDateTime(localDateTime);
             }catch (Exception e){
                 ctx.fireChannelRead(list);
                 return;
