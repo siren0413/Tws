@@ -48,9 +48,17 @@ public class Level1UpdateSpout extends BaseRichSpout {
                     level1Update.getLastSize(),
                     level1Update.getLastTime(),
                     level1Update.getTotalVolume(),
+                    level1Update.getExtendedTrade(),
+                    level1Update.getExtendedTradeSize(),
+                    level1Update.getExtendedTradeDate(),
+                    level1Update.getExtendedTradeTime(),
                     level1Update.getLow(),
                     level1Update.getHigh(),
-                    level1Update.getOpen()
+                    level1Update.getOpen(),
+                    level1Update.getMessageContent(),
+                    level1Update.getDelay(),
+                    level1Update.getExchangeId(),
+                    level1Update.getLocalDateTime()
             ));
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -59,6 +67,7 @@ public class Level1UpdateSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(STREAM_ID, new Fields(SYMBOL, BID, BID_SIZE, BID_TIME, ASK, ASK_SIZE, ASK_TIME, LAST, LAST_SIZE, LAST_TIME, TOTAL_VOLUME, LOW, HIGH, OPEN));
+        declarer.declareStream(STREAM_ID, new Fields(SYMBOL, BID, BID_SIZE, BID_TIME, ASK, ASK_SIZE, ASK_TIME, LAST, LAST_SIZE, LAST_TIME, EXTENDED_TRADE,
+                EXTENDED_TRADE_SIZE, EXTENDED_TRADE_DATE, EXTENDED_TRADE_TIME, TOTAL_VOLUME, LOW, HIGH, OPEN, MESSAGE_CONTENT, DELAY, EXCHANGE_ID, LOCAL_DATE_TIME));
     }
 }

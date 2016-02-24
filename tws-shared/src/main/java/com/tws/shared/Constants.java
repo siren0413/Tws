@@ -36,11 +36,21 @@ public class Constants {
     public static final String LAST = "last";
     public static final String LAST_SIZE = "lastSize";
     public static final String LAST_TIME = "lastTime";
+
+    public static final String EXTENDED_TRADE = "extendedTrade";
+    public static final String EXTENDED_TRADE_SIZE = "extendedTradeSize";
+    public static final String EXTENDED_TRADE_DATE = "extendedTradeDate";
+    public static final String EXTENDED_TRADE_TIME = "extendedTradeTime";
+
     public static final String TOTAL_VOLUME = "totalVolume";
     public static final String LOW = "low";
     public static final String HIGH = "high";
     public static final String OPEN = "open";
 
+    public static final String MESSAGE_CONTENT = "messageContent";
+    public static final String DELAY = "delay";
+    public static final String EXCHANGE_ID = "exchangeId";
+    public static final String LOCAL_DATE_TIME = "localDateTime";
 
 
 
