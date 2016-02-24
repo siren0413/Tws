@@ -33,7 +33,7 @@ public class Command {
             return "S,REQUEST STATS\r\n";
         }
         public static String SELECT_UPDATE_FIELD(){
-            return "S,SELECT UPDATE FIELDS,Bid,Bid Size,Bid Time,Ask,Ask Size,Ask Time,Last,Last Size,Last Time,Total Volume,Low,High,Open\r\n";
+            return "S,SELECT UPDATE FIELDS,Bid,Bid Size,Bid Time,Ask,Ask Size,Ask Time,Last,Last Size,Last Time,Extended Trade,Extended Trade Date,Extended Trade Time,Extended Trade Size,Total Volume,Low,High,Open,Message Contents,Exchange ID,Delay\r\n";
         }
 
     }
