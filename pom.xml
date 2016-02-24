@@ -19,6 +19,7 @@
         <module>tws-iqfeed</module>
         <module>tws-message</module>
         <module>tws-simulator</module>
+        <module>tws-storm</module>
     </modules>
 
     <properties>
