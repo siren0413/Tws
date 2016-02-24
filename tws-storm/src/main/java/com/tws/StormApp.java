@@ -23,13 +23,13 @@ public class StormApp
         ApplicationContext ctx = new ClassPathXmlApplicationContext("storm-spring.xml");
 
         Config conf = new Config();
-        conf.setDebug(true);
-        conf.setNumWorkers(2);
+        conf.setDebug(false);
+        conf.setNumWorkers(1);
 
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("C_LEVEL1_SUMMARY_SPOUT", new Level1SummarySpout(), 5);
         builder.setSpout("C_LEVEL1_UPDATE_SPOUT", new Level1UpdateSpout(), 5);
-        builder.setBolt("C_LEVEL1_ONE_SEC_BOLT", new Level1IntervalFilterBolt()).fieldsGrouping("C_LEVEL1_UPDATE_SPOUT","S_LEVEL1_UPDATE",new Fields("symbol"));
+        builder.setBolt("C_LEVEL1_ONE_SEC_BOLT", new Level1IntervalFilterBolt(5)).fieldsGrouping("C_LEVEL1_UPDATE_SPOUT","S_LEVEL1_UPDATE",new Fields("symbol"));
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("test", conf, builder.createTopology());

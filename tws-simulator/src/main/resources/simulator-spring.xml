@@ -34,7 +34,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
 
     <bean id="historyIntervalScannerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
         <property name="jobDetail" ref="historyIntervalScannerJob"/>
-        <property name="repeatInterval" value="500"/>
+        <property name="repeatInterval" value="1000"/>
         <property name="startDelay" value="0"/>
     </bean>
 

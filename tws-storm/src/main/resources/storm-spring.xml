@@ -58,6 +58,7 @@ http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.spri
         <property name="messageListener">
             <bean class="com.tws.storm.listener.Level1UpdateListener"/>
         </property>
+        <property name="concurrency" value="1"/>
     </bean>
 
     <bean id="level1SummaryListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
