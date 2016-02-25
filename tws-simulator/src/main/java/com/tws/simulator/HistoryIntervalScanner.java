@@ -37,7 +37,6 @@ public class HistoryIntervalScanner implements Runnable {
     @Override
     public void run() {
 
-
         ListenableFuture<Result<HistoryIntervalDB>> listenableFuture = repository.getIntervalInTime(symbol, 1, startTime, endTime);
         try {
             Result<HistoryIntervalDB> result = listenableFuture.get(10000, TimeUnit.SECONDS);

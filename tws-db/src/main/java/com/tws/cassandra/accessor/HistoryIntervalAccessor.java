@@ -23,9 +23,9 @@ public interface HistoryIntervalAccessor {
     @QueryParameters(consistency = "ONE")
     ListenableFuture<Result<HistoryIntervalDB>> getIntervalInTime(@Param("symbol") String symbol, @Param("interval") int interval, @Param("start") long start);
 
-    @Query("SELECT * FROM history.time WHERE symbol = :symbol AND interval = :interval AND time >= :start ORDER BY time ASC LIMIT :dataPoints ALLOW FILTERING")
-    @QueryParameters(consistency = "ONE")
-    ListenableFuture<Result<HistoryIntervalDB>> getIntervalInTime(@Param("symbol") String symbol, @Param("interval") int interval, @Param("start") long start, @Param("dataPoints") int dataPoints);
+//    @Query("SELECT * FROM history.time WHERE symbol = :symbol AND interval = :interval AND time >= :start ORDER BY time ASC LIMIT :dataPoints ALLOW FILTERING")
+//    @QueryParameters(consistency = "ONE")
+//    ListenableFuture<Result<HistoryIntervalDB>> getIntervalInTime(@Param("symbol") String symbol, @Param("interval") int interval, @Param("start") long start, @Param("dataPoints") int dataPoints);
 
     @Query("SELECT * FROM history.time WHERE symbol = :symbol AND interval = :interval ORDER BY time DESC LIMIT 1")
     HistoryIntervalDB getMostRecentRecordInTime(@Param("symbol") String symbol, @Param("interval") int interval);

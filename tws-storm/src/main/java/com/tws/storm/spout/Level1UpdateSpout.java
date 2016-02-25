@@ -3,19 +3,15 @@ package com.tws.storm.spout;
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import com.tws.shared.iqfeed.model.Level1Summary;
 import com.tws.shared.iqfeed.model.Level1Update;
+import com.tws.storm.TupleDefinition;
 
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import static com.tws.shared.Constants.*;
-import static com.tws.shared.Constants.OPEN;
 
 
 /**
@@ -67,7 +63,6 @@ public class Level1UpdateSpout extends BaseRichSpout {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(STREAM_ID, new Fields(SYMBOL, BID, BID_SIZE, BID_TIME, ASK, ASK_SIZE, ASK_TIME, LAST, LAST_SIZE, LAST_TIME, EXTENDED_TRADE,
-                EXTENDED_TRADE_SIZE, EXTENDED_TRADE_DATE, EXTENDED_TRADE_TIME, TOTAL_VOLUME, LOW, HIGH, OPEN, MESSAGE_CONTENT, DELAY, EXCHANGE_ID, LOCAL_DATE_TIME));
+        declarer.declareStream(STREAM_ID, TupleDefinition.S_LEVEL1_UPDATE);
     }
 }
