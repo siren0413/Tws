@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import com.tws.shared.common.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +47,8 @@ public class Level1IntervalFilterBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
         // data from stream
         String symbol = tuple.getStringByField(SYMBOL);
-        long lastTime =  LocalDateTime.parse(tuple.getStringByField(LOCAL_DATE_TIME),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli();
-        float lastPrice = (tuple.getFloatByField(BID) +  tuple.getFloatByField(ASK)) / 2;
+        long lastTime = LocalDateTime.parse(tuple.getStringByField(LOCAL_DATE_TIME), TimeUtils.dateTimeMicroSecFormatter).atZone(TimeUtils.ZONE_EST).toInstant().toEpochMilli();
+        float lastPrice = (tuple.getFloatByField(BID) + tuple.getFloatByField(ASK)) / 2;
 
         StatusHolder stat = map.get(symbol);
         if (stat == null) {
@@ -67,8 +68,8 @@ public class Level1IntervalFilterBolt extends BaseRichBolt {
             // emit old data
             float avg = stat.total / (float) stat.count;
             long time = (stat.previousLastTime / 1000) * 1000;
-            ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.of("America/New_York"));
-            String timeString = zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), TimeUtils.ZONE_EST);
+            String timeString = zonedDateTime.format(TimeUtils.dateTimeSecFormatter);
             outputCollector.emit(new Values(symbol, timeString, time, avg));
             System.out.println(new Values(symbol, timeString, time, avg));
             // inject new data

@@ -7,16 +7,14 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import com.tws.shared.common.TimeUtils;
 import com.tws.storm.TickAction;
+import com.tws.storm.TupleDefinition;
 import com.tws.storm.Utils;
-import com.tws.storm.job.BarMonitorJob;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
@@ -38,7 +36,7 @@ public class Level1BarFilterBolt2 extends BaseRichBolt implements TickAction {
     private OutputCollector outputCollector;
     private final Map<String, Queue<Tuple>> map = new ConcurrentHashMap<>();
     private boolean mock = false;
-    private long lastEmitTimeSec = 0;
+    private long lastEmitIntervalTimeSec = 0;
 
     public Level1BarFilterBolt2(int interval) {
         this.interval = interval;
@@ -66,37 +64,60 @@ public class Level1BarFilterBolt2 extends BaseRichBolt implements TickAction {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(STREAM_ID + "_" + interval, new Fields(SYMBOL, "timestamp", "time", "last"));
+        declarer.declareStream(STREAM_ID + "_" + interval, TupleDefinition.S_LEVEL1_BAR);
     }
 
     @Override
     public void action() {
         ZonedDateTime currZonedDateTime = Utils.getCurrentZonedDateTime(mock);
-        long currTimeSec = currZonedDateTime.toInstant().toEpochMilli() / (interval * 1000);
-        if (lastEmitTimeSec == 0) {
-            lastEmitTimeSec = currTimeSec;
-        } else if (lastEmitTimeSec != currTimeSec) {
+        long currIntervalTimeSec = currZonedDateTime.toInstant().toEpochMilli() / (interval * 1000);
+        if (lastEmitIntervalTimeSec == 0) {
+
+            lastEmitIntervalTimeSec = currIntervalTimeSec;
+            map.values().forEach(Queue<Tuple>::clear);
+
+        } else if (lastEmitIntervalTimeSec != currIntervalTimeSec) {
             for (Map.Entry<String, Queue<Tuple>> entry : map.entrySet()) {
                 String symbol = entry.getKey();
                 Queue<Tuple> queue = entry.getValue();
+
                 float total = 0;
+                float low = Float.MAX_VALUE;
+                float high = 0;
+                float open = 0;
+                float close = 0;
+                int volume = 0;
                 int count = 0;
+
                 while (!queue.isEmpty()) {
                     Tuple tuple = queue.poll();
-                    total += (tuple.getFloatByField(BID) + tuple.getFloatByField(ASK)) / 2;
+                    float price = (tuple.getFloatByField(BID) + tuple.getFloatByField(ASK)) / 2;
+
+                    total += price;
+                    low = Float.min(low, price);
+                    high = Float.max(high, price);
+                    if (open == 0) {
+                        open = price;
+                        volume = tuple.getIntegerByField(TOTAL_VOLUME);
+                    }
+                    if (queue.isEmpty()) {
+                        close = price;
+                        volume = tuple.getIntegerByField(TOTAL_VOLUME) - volume;
+                    }
                     count++;
                 }
+
+                String baseTimestamp = currZonedDateTime.format(TimeUtils.dateTimeSecFormatter);
+
                 if (count != 0) {
-                    float avg = total / count;
-                    String baseTimestamp = currZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
-                    outputCollector.emit(STREAM_ID, new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), avg));
-                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), avg));
+                    outputCollector.emit(STREAM_ID, new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), low, high, open, close, volume));
+                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), low, high, open, close, volume));
                 } else {
-                    outputCollector.emit(STREAM_ID, new Values(symbol, currZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")), currZonedDateTime.toInstant().toEpochMilli(), Float.NaN));
-                    System.out.println(new Values(symbol, currZonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")), currZonedDateTime.toInstant().toEpochMilli(), Float.NaN));
+                    outputCollector.emit(STREAM_ID, new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
                 }
             }
-            lastEmitTimeSec = currTimeSec;
+            lastEmitIntervalTimeSec = currIntervalTimeSec;
         }
     }
 }

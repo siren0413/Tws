@@ -3,6 +3,7 @@ package com.tws.simulator;
 import com.tws.activemq.ActivemqPublisher;
 import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
+import com.tws.shared.common.TimeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -55,13 +56,13 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
         LocalDateTime localDateTime = LocalDateTime.parse(startTimeString, dtf);
-        ZonedDateTime startDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
+        ZonedDateTime startDateTime = localDateTime.atZone(TimeUtils.ZONE_EST);
         startTime = startDateTime.toInstant().toEpochMilli();
         if (endTimeString == null) {
             endTime = -1;
         } else {
             LocalDateTime endLocalDateTime = LocalDateTime.parse(endTimeString, dtf);
-            ZonedDateTime endDateTime = endLocalDateTime.atZone(ZoneId.of("America/New_York"));
+            ZonedDateTime endDateTime = endLocalDateTime.atZone(TimeUtils.ZONE_EST);
             endTime = endDateTime.toInstant().toEpochMilli();
         }
 
@@ -129,7 +130,7 @@ public class HistoryIntervalSimulatorJob extends QuartzJobBean {
     private long adjustStartTime(long startTime) {
 
         Instant instant = Instant.ofEpochMilli(startTime);
-        ZonedDateTime startZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
+        ZonedDateTime startZonedDateTime = ZonedDateTime.ofInstant(instant, TimeUtils.ZONE_EST);
 
         boolean modified = true;
         while (modified) {

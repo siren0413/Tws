@@ -1,7 +1,7 @@
 package com.tws.iqfeed.handler.level1;
 
 import com.tws.activemq.ActivemqPublisher;
-import com.tws.rabbitmq.RabbitmqPublisher;
+import com.tws.shared.common.Utils;
 import com.tws.shared.iqfeed.model.Level1Timestamp;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ public class Level1TimeMessageHandler extends SimpleChannelInboundHandler<List<S
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX, level1Timestamp);
+            publisher.publish(LEVEL1_TIMESTAMP_ROUTEKEY_PREFIX, Utils.getGson().toJson(list));
         }else{
             ctx.fireChannelRead(list);
         }

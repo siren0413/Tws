@@ -1,7 +1,8 @@
 package com.tws.iqfeed.handler.level1;
 
 import com.tws.activemq.ActivemqPublisher;
-import com.tws.rabbitmq.RabbitmqPublisher;
+import com.tws.shared.common.TimeUtils;
+import com.tws.shared.common.Utils;
 import com.tws.shared.iqfeed.model.Level1Summary;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
-import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,15 +53,14 @@ public class Level1SummaryMessageHandler extends SimpleChannelInboundHandler<Lis
                 level1Summary.setMessageContent(list.get(i++));
                 level1Summary.setExchangeId(list.get(i++));
                 level1Summary.setDelay(NumberUtils.toInt(list.get(i++)));
-                ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
-                String localDateTime = zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+                ZonedDateTime zonedDateTime = ZonedDateTime.now(TimeUtils.ZONE_EST);
+                String localDateTime = zonedDateTime.format(TimeUtils.dateTimeMilliSecFormatter);
                 level1Summary.setLocalDateTime(localDateTime);
             }catch (Exception e){
                 ctx.fireChannelRead(list);
                 return;
             }
-            publisher.publish(LEVEL1_SUMMARY_ROUTEKEY_PREFIX, level1Summary);
-//            publisher.publish(LEVEL1_EXCHANGE, String.join(ROUTEKEY_DELIMETER, LEVEL1_SUMMARY_ROUTEKEY_PREFIX, level1Summary.getSymbol()), level1Summary);
+            publisher.publish(LEVEL1_SUMMARY_ROUTEKEY_PREFIX, Utils.getGson().toJson(level1Summary));
         } else {
             ctx.fireChannelRead(list);
         }

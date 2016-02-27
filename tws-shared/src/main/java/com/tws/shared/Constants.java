@@ -25,7 +25,7 @@ public class Constants {
 
 
 
-//    field name
+//    level1update
     public static final String SYMBOL = "symbol";
     public static final String BID = "bid";
     public static final String BID_SIZE = "bidSize";
@@ -52,6 +52,12 @@ public class Constants {
     public static final String EXCHANGE_ID = "exchangeId";
     public static final String LOCAL_DATE_TIME = "localDateTime";
 
+
+    // level1bar
+    public static final String TIMESTAMP = "timestamp";
+    public static final String TIME = "time";
+    public static final String CLOSE = "close";
+    public static final String PERIOD_VOLUME = "periodVolume";
 
 
 }

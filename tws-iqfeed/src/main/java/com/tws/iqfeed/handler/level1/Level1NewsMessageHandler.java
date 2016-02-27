@@ -1,13 +1,12 @@
 package com.tws.iqfeed.handler.level1;
 
 import com.tws.activemq.ActivemqPublisher;
-import com.tws.rabbitmq.RabbitmqPublisher;
+import com.tws.shared.common.Utils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.Serializable;
 import java.util.List;
 
 import static com.tws.shared.Constants.*;
@@ -24,8 +23,7 @@ public class Level1NewsMessageHandler extends SimpleChannelInboundHandler<List<S
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
         if ("N".equals(list.get(0))) {
-            publisher.publish(LEVEL1_NEWS_ROUTEKEY_PREFIX, (Serializable)list);
-//            publisher.publish(LEVEL1_EXCHANGE, LEVEL1_NEWS_ROUTEKEY_PREFIX, list);
+            publisher.publish(LEVEL1_NEWS_ROUTEKEY_PREFIX, Utils.getGson().toJson(list));
         }else{
             ctx.fireChannelRead(list);
         }

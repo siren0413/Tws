@@ -3,6 +3,7 @@ package com.tws.repository.service;
 import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
 import com.tws.repository.GlobalQueues;
+import com.tws.shared.common.TimeUtils;
 import com.tws.shared.iqfeed.model.HistoryInterval;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -69,12 +70,12 @@ public class HistoryIntervalStoreService implements InitializingBean {
             }
             ZonedDateTime zonedDateTime;
             try {
-                LocalDateTime localDateTime = LocalDateTime.parse(historyInterval.getTimestamp().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                zonedDateTime = localDateTime.atZone(ZoneId.of("America/New_York"));
+                LocalDateTime localDateTime = LocalDateTime.parse(historyInterval.getTimestamp().trim(), TimeUtils.dateTimeSecFormatter);
+                zonedDateTime = localDateTime.atZone(TimeUtils.ZONE_EST);
             } catch (DateTimeParseException e) {
                 try {
-                    LocalDate localDate = LocalDate.parse(historyInterval.getTimestamp().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                    zonedDateTime = localDate.atStartOfDay(ZoneId.of("America/New_York"));
+                    LocalDate localDate = LocalDate.parse(historyInterval.getTimestamp().trim(), TimeUtils.dateFormatter);
+                    zonedDateTime = localDate.atStartOfDay(TimeUtils.ZONE_EST);
                 } catch (DateTimeParseException e1) {
                     logger.error("unable to parse date: {}", historyInterval.getTimestamp(),e);
                     return;

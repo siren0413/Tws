@@ -5,6 +5,7 @@ import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
 import com.tws.repository.GlobalQueues;
 import com.tws.shared.Constants;
+import com.tws.shared.common.TimeUtils;
 import org.quartz.JobDataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ public class HistoryIntervalUpdateService {
         ZonedDateTime lastEndZonedDateTime = (ZonedDateTime) wrapperMap.get(symbol);
         if (lastEndZonedDateTime == null) {
             Instant instant = Instant.ofEpochMilli(startTime);
-            startZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
+            startZonedDateTime = ZonedDateTime.ofInstant(instant, TimeUtils.ZONE_EST);
         } else {
             startZonedDateTime = lastEndZonedDateTime;
         }
@@ -117,8 +118,8 @@ public class HistoryIntervalUpdateService {
                 modified = true;
             }
 
-            if(startZonedDateTime.isAfter(ZonedDateTime.now(ZoneId.of("America/New_York")))){
-                startZonedDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
+            if(startZonedDateTime.isAfter(ZonedDateTime.now(TimeUtils.ZONE_EST))){
+                startZonedDateTime = ZonedDateTime.now(TimeUtils.ZONE_EST);
                 break;
             }
         }

@@ -1,5 +1,6 @@
 package com.tws.iqfeed.handler.level1;
 
+import com.tws.shared.common.Utils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -19,7 +20,7 @@ public class Level1SymbolNotFoundHandler extends SimpleChannelInboundHandler<Lis
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
         if ("n".equals(list.get(0))) {
-            logger.error("Symbol not found: {}", list);
+            logger.error("Symbol not found: {}", Utils.getGson().toJson(list));
         }else{
             ctx.fireChannelRead(list);
         }

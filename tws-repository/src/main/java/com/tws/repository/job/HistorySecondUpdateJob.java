@@ -2,6 +2,7 @@ package com.tws.repository.job;
 
 import com.tws.repository.service.HistoryIntervalUpdateService;
 import com.tws.repository.service.UpdateMode;
+import com.tws.shared.common.TimeUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class HistorySecondUpdateJob extends QuartzJobBean implements StatefulJob
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss");
         LocalDateTime localDateTime = LocalDateTime.parse(startString, dtf);
-        startDate = localDateTime.atZone(ZoneId.of("America/New_York"));
+        startDate = localDateTime.atZone(TimeUtils.ZONE_EST);
         interval = NumberUtils.toInt(intervalString);
         maxDataPoints = NumberUtils.toInt(maxDataPointsString);
         mode = UpdateMode.valueOf(updateModeString);

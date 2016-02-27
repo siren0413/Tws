@@ -5,11 +5,10 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+import com.tws.shared.common.TimeUtils;
 import com.tws.storm.Utils;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static com.tws.shared.Constants.LOCAL_DATE_TIME;
@@ -28,8 +27,8 @@ public class MockTimeUpdateBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple input) {
-        if(mock) {
-            Utils.currentZonedDateTime = LocalDateTime.parse(input.getStringByField(LOCAL_DATE_TIME), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")).atZone(ZoneId.of("America/New_York"));
+        if (mock) {
+            Utils.currentZonedDateTime = LocalDateTime.parse(input.getStringByField(LOCAL_DATE_TIME), TimeUtils.dateTimeMicroSecFormatter).atZone(TimeUtils.ZONE_EST);
         }
     }
 

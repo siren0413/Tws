@@ -5,6 +5,7 @@ import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
 import com.tws.repository.GlobalQueues;
 import com.tws.shared.Constants;
+import com.tws.shared.common.TimeUtils;
 import org.quartz.JobDataMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class HistoryRealTimeUpdateService {
 
         long startTime = historyIntervalDB.getTime();
         Instant instant = Instant.ofEpochMilli(startTime);
-        ZonedDateTime startZonedDateTime = ZonedDateTime.ofInstant(instant, ZoneId.of("America/New_York"));
+        ZonedDateTime startZonedDateTime = ZonedDateTime.ofInstant(instant, TimeUtils.ZONE_EST);
 
         // adjust start time to skip 20pm-4am and SAT-SUN
         startZonedDateTime = adjustStartTime(startZonedDateTime);
@@ -107,8 +108,8 @@ public class HistoryRealTimeUpdateService {
                 modified = true;
             }
 
-            if (startZonedDateTime.isAfter(ZonedDateTime.now(ZoneId.of("America/New_York")))) {
-                startZonedDateTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
+            if (startZonedDateTime.isAfter(ZonedDateTime.now(TimeUtils.ZONE_EST))) {
+                startZonedDateTime = ZonedDateTime.now(TimeUtils.ZONE_EST);
                 break;
             }
         }

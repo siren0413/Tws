@@ -1,7 +1,7 @@
 package com.tws.iqfeed.handler.level1;
 
 import com.tws.activemq.ActivemqPublisher;
-import com.tws.rabbitmq.RabbitmqPublisher;
+import com.tws.shared.common.Utils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -32,10 +31,10 @@ public class Level1SystemMessageHandler extends SimpleChannelInboundHandler<List
             String operation = list.get(1);
             switch (operation) {
                 case "WATCHES":
-                    publisher.publish(LEVEL1_SYSTEM_WATCH_KEY, (Serializable)list);
+                    publisher.publish(LEVEL1_SYSTEM_WATCH_KEY, Utils.getGson().toJson(list));
                     break;
                 default:
-                    publisher.publish(LEVEL1_SYSTEM_ROUTEKEY_PREFIX, (Serializable)list);
+                    publisher.publish(LEVEL1_SYSTEM_ROUTEKEY_PREFIX, Utils.getGson().toJson(list));
             }
         } else {
             ctx.fireChannelRead(list);

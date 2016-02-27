@@ -2,6 +2,8 @@ package com.tws.simulator;
 
 import com.tws.activemq.ActivemqPublisher;
 import com.tws.cassandra.model.HistoryIntervalDB;
+import com.tws.shared.common.TimeUtils;
+import com.tws.shared.common.Utils;
 import com.tws.shared.iqfeed.model.Level1Update;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,10 +32,10 @@ public class HistoryIntervalToLevel1UpdatePublisher implements Runnable {
     private Level1Update convertHistoryIntervalDBToLevel1Update(HistoryIntervalDB historyIntervalDB) {
         Level1Update level1Update = new Level1Update();
 
-        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(historyIntervalDB.getTime()), ZoneId.of("America/New_York"));
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(historyIntervalDB.getTime()), TimeUtils.ZONE_EST);
         String timestamp = zonedDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSSSSS"));
         String dateStr = zonedDateTime.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
-        String localDateTime = zonedDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS"));
+        String localDateTime = zonedDateTime.format(TimeUtils.dateTimeMicroSecFormatter);
 
         level1Update.setSymbol(historyIntervalDB.getSymbol());
         level1Update.setBid(historyIntervalDB.getClose());
@@ -66,7 +68,7 @@ public class HistoryIntervalToLevel1UpdatePublisher implements Runnable {
             HistoryIntervalDB historyIntervalDB = Global.dbQueue.poll();
             if (historyIntervalDB != null) {
                 Level1Update level1Update = convertHistoryIntervalDBToLevel1Update(historyIntervalDB);
-                publisher.publish("Q", level1Update);
+                publisher.publish("Q", Utils.getGson().toJson(level1Update));
             }
         }
     }

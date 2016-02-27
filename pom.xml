@@ -59,10 +59,11 @@
             <version>18.0</version>
         </dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.9.2</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.6.1</version>
         </dependency>
+
         <!--spring framework-->
         <dependency>
             <groupId>org.springframework</groupId>

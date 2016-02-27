@@ -1,7 +1,7 @@
 package com.tws.iqfeed.handler.level1;
 
 import com.tws.activemq.ActivemqPublisher;
-import com.tws.rabbitmq.RabbitmqPublisher;
+import com.tws.shared.common.Utils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.tws.shared.Constants.*;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -25,8 +24,7 @@ public class Level1RegionalMessageHandler extends SimpleChannelInboundHandler<Li
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<String> list) throws Exception {
         if ("R".equals(list.get(0))) {
-            publisher.publish(LEVEL1_REGIONAL_ROUTEKEY_PREFIX, (Serializable)list);
-//            publisher.publish(LEVEL1_EXCHANGE, String.join(ROUTEKEY_DELIMETER, LEVEL1_REGIONAL_ROUTEKEY_PREFIX, list.get(1)), list);
+            publisher.publish(LEVEL1_REGIONAL_ROUTEKEY_PREFIX, Utils.getGson().toJson(list));
         } else {
             ctx.fireChannelRead(list);
         }
