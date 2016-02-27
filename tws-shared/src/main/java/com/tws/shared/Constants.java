@@ -59,5 +59,9 @@ public class Constants {
     public static final String CLOSE = "close";
     public static final String PERIOD_VOLUME = "periodVolume";
 
+    public static final String AVERAGE = "average";
+    public static final String CONFIDIENCE = "confidience";
+    public static final String INTERVAL = "interval";
+
 
 }
