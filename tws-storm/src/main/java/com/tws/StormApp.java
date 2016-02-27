@@ -4,11 +4,10 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import com.tws.cassandra.repo.HistoryIntervalRepository;
+import com.tws.shared.Constants;
+import com.tws.shared.iqfeed.model.Level1Update;
 import com.tws.storm.StormConfiguration;
-import com.tws.storm.bolt.Level1BarFilterBolt;
-import com.tws.storm.bolt.Level1SMASecBolt;
-import com.tws.storm.bolt.MockTimeUpdateBolt;
+import com.tws.storm.bolt.*;
 import com.tws.storm.spout.Level1SummarySpout;
 import com.tws.storm.spout.Level1UpdateSpout;
 import com.tws.storm.spout.TickSpout;
@@ -30,14 +29,14 @@ public class StormApp {
         conf.put("symbolList", configuration.getSymbolList());
 
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("C_LEVEL1_SUMMARY_SPOUT", new Level1SummarySpout(), 5);
-        builder.setSpout("C_LEVEL1_UPDATE_SPOUT", new Level1UpdateSpout(), 5);
-        builder.setSpout("C_TICK_SPOUT", new TickSpout(), 1).setNumTasks(1);
+        builder.setSpout(Level1SummarySpout.COMPONENT_ID, new Level1SummarySpout(), 5);
+        builder.setSpout(Level1UpdateSpout.COMPONENT_ID, new Level1UpdateSpout(), 5);
+        builder.setSpout(TickSpout.COMPONENT_ID, new TickSpout(), 1).setNumTasks(1);
 
-        builder.setBolt("C_LEVEL1_FIVE_SECOND_BAR_BOLT", new Level1BarFilterBolt(5)).fieldsGrouping("C_LEVEL1_UPDATE_SPOUT", "S_LEVEL1_UPDATE", new Fields("symbol")).shuffleGrouping("C_TICK_SPOUT", "S_TICK");
-        builder.setBolt("C_LEVEL1_THIRTY_SECOND_SMA_BOLT", new Level1SMASecBolt(60)).fieldsGrouping("C_LEVEL1_FIVE_SECOND_BAR_BOLT", "S_BAR", new Fields("symbol"));
+        builder.setBolt(Level1Bar1SecBolt.COMPONENT_ID, new Level1Bar1SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
+        builder.setBolt(Level1SMA60SecBolt.COMPONENT_ID, new Level1SMA60SecBolt()).fieldsGrouping(Level1Bar1SecBolt.COMPONENT_ID, Level1Bar1SecBolt.STREAM_ID, new Fields(Constants.SYMBOL));
 
-        builder.setBolt("C_MOCK_TIME_UPDATE_BOLT", new MockTimeUpdateBolt()).shuffleGrouping("C_LEVEL1_UPDATE_SPOUT", "S_LEVEL1_UPDATE");
+        builder.setBolt(MockTimeUpdateBolt.COMPONENT_ID, new MockTimeUpdateBolt()).shuffleGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID);
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("test", conf, builder.createTopology());

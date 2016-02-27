@@ -12,6 +12,7 @@ import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
 import com.tws.shared.common.TimeUtils;
 import com.tws.storm.TupleDefinition;
+import com.tws.storm.Utils;
 import com.tws.storm.model.SMAData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,22 +30,17 @@ import static com.tws.shared.Constants.*;
 /**
  * Created by chris on 2/26/16.
  */
-public class Level1SMASecBolt extends BaseRichBolt {
+public abstract class Level1SMABaseBolt extends BaseRichBolt {
 
-    private static final Logger logger = LoggerFactory.getLogger(Level1SMASecBolt.class);
-    public static final String STREAM_ID = "S_SMA";
+    private static final Logger logger = LoggerFactory.getLogger(Level1SMABaseBolt.class);
 
-    private int interval;
     private boolean mock = false;
-    private boolean initialized = false;
     private OutputCollector outputCollector;
     private final Map<String, PriorityQueue<SMAData>> map = new ConcurrentHashMap<>();
 
     private HistoryIntervalRepository repository;
 
-    public Level1SMASecBolt(int interval) {
-        this.interval = interval;
-    }
+
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -56,6 +52,8 @@ public class Level1SMASecBolt extends BaseRichBolt {
 
         this.outputCollector = collector;
 
+        ZonedDateTime currZonedDateTime = Utils.getCurrentZonedDateTime(mock);
+
         for (String symbol : symbolList) {
             PriorityQueue<SMAData> queue = new PriorityQueue<SMAData>(new Comparator<SMAData>() {
                 @Override
@@ -64,35 +62,30 @@ public class Level1SMASecBolt extends BaseRichBolt {
                 }
             });
             map.put(symbol, queue);
+
+            ListenableFuture<Result<HistoryIntervalDB>> future = repository.getIntervalInTimeForPoints(symbol, 1, currZonedDateTime.toInstant().toEpochMilli(), getInterval());
+            try {
+                Result<HistoryIntervalDB> resultSet = future.get(getInterval(), TimeUnit.SECONDS);
+                for (HistoryIntervalDB historyIntervalDB : resultSet) {
+                    queue.add(new SMAData(historyIntervalDB.getTime(), historyIntervalDB.getClose()));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void execute(Tuple input) {
-        ZonedDateTime currZonedDateTime = LocalDateTime.parse(input.getStringByField(TIMESTAMP),TimeUtils.dateTimeSecFormatter).atZone(TimeUtils.ZONE_EST);
-        ZonedDateTime startZonedDateTime = currZonedDateTime.minusSeconds(interval);
+        ZonedDateTime currZonedDateTime = LocalDateTime.parse(input.getStringByField(TIMESTAMP), TimeUtils.dateTimeSecFormatter).atZone(TimeUtils.ZONE_EST);
+        ZonedDateTime startZonedDateTime = currZonedDateTime.minusSeconds(getInterval());
 
         int barInterval = input.getIntegerByField(INTERVAL);
         Float close = input.getFloatByField(CLOSE);
         long time = input.getLongByField(TIME);
         String symbol = input.getStringByField(SYMBOL);
         PriorityQueue<SMAData> queue = map.get(symbol);
-
-        if(!initialized){
-            for(Map.Entry<String,PriorityQueue<SMAData>> entry: map.entrySet()) {
-                ListenableFuture<Result<HistoryIntervalDB>> future = repository.getIntervalInTime(entry.getKey(), 1, startZonedDateTime.toInstant().toEpochMilli(), currZonedDateTime.toInstant().toEpochMilli());
-                try {
-                    Result<HistoryIntervalDB> resultSet = future.get(60, TimeUnit.SECONDS);
-                    for (HistoryIntervalDB historyIntervalDB : resultSet) {
-                        entry.getValue().add(new SMAData(historyIntervalDB.getTime(), historyIntervalDB.getClose()));
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            initialized = true;
-        }
 
         if (!close.isNaN()) {
             queue.add(new SMAData(time, close));
@@ -101,7 +94,7 @@ public class Level1SMASecBolt extends BaseRichBolt {
             SMAData headData = queue.peek();
             if (headData.getTime() <= startZonedDateTime.toInstant().toEpochMilli()) {
                 queue.poll();
-            }else{
+            } else {
                 break;
             }
         }
@@ -111,16 +104,17 @@ public class Level1SMASecBolt extends BaseRichBolt {
             total += data.getClose();
             count++;
         }
-        float confidence = (float) count * barInterval / (float) interval;
+        float confidence = (float) count * barInterval / (float) getInterval();
         float avg = total / count;
-        outputCollector.emit(STREAM_ID, new Values(symbol, currZonedDateTime.format(TimeUtils.dateTimeSecFormatter), currZonedDateTime.toInstant().toEpochMilli(), avg, confidence));
+        outputCollector.emit(getStreamId(), new Values(symbol, currZonedDateTime.format(TimeUtils.dateTimeSecFormatter), currZonedDateTime.toInstant().toEpochMilli(), avg, confidence));
         System.out.println(new Values(symbol, currZonedDateTime.format(TimeUtils.dateTimeSecFormatter), currZonedDateTime.toInstant().toEpochMilli(), avg, confidence));
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(STREAM_ID , TupleDefinition.S_LEVEL1_SMA);
+        declarer.declareStream(getStreamId(), TupleDefinition.S_LEVEL1_SMA);
     }
 
-
+    protected abstract int getInterval();
+    protected abstract String getStreamId();
 }

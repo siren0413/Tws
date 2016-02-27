@@ -18,6 +18,8 @@ import static com.tws.shared.Constants.LOCAL_DATE_TIME;
  */
 public class MockTimeUpdateBolt extends BaseRichBolt {
 
+    public static final String COMPONENT_ID = "C_MOCK_TIME_UPDATE_BOLT";
+
     private boolean mock = false;
 
     @Override

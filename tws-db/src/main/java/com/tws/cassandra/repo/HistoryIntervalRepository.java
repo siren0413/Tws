@@ -44,10 +44,10 @@ public class HistoryIntervalRepository implements InitializingBean, HistoryInter
         return accessor.getIntervalInTime(symbol, interval, start);
     }
 
-//    @Override
-//    public ListenableFuture<Result<HistoryIntervalDB>> getIntervalInTime(@Param("symbol") String symbol, @Param("interval") int interval, @Param("start") long start, @Param("dataPoints") int dataPoints) {
-//        return accessor.getIntervalInTime(symbol, interval, start, dataPoints);
-//    }
+    @Override
+    public ListenableFuture<Result<HistoryIntervalDB>> getIntervalInTimeForPoints(@Param("symbol") String symbol, @Param("interval") int interval, @Param("end") long end, @Param("dataPoints") int dataPoints) {
+        return accessor.getIntervalInTimeForPoints(symbol, interval, end, dataPoints);
+    }
 
     @Override
     public HistoryIntervalDB getMostRecentRecordInTime(@Param("symbol") String symbol, @Param("interval") int interval) {

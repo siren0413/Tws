@@ -24,20 +24,14 @@ import static com.tws.shared.Constants.*;
 /**
  * Created by chris on 2/24/16.
  */
-public class Level1BarFilterBolt extends BaseRichBolt implements TickAction {
+public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(Level1BarFilterBolt.class);
-    public static final String STREAM_ID = "S_BAR";
+    private static final Logger logger = LoggerFactory.getLogger(Level1BarBaseBolt.class);
 
-    private int interval;
     private OutputCollector outputCollector;
     private final Map<String, Queue<Tuple>> map = new ConcurrentHashMap<>();
     private boolean mock = false;
     private long lastEmitIntervalTimeSec = 0;
-
-    public Level1BarFilterBolt(int interval) {
-        this.interval = interval;
-    }
 
     @Override
     public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
@@ -61,13 +55,16 @@ public class Level1BarFilterBolt extends BaseRichBolt implements TickAction {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream(STREAM_ID, TupleDefinition.S_LEVEL1_BAR);
+        declarer.declareStream(getStreamId(), TupleDefinition.S_LEVEL1_BAR);
     }
+
+    protected abstract int getInterval();
+    protected abstract String getStreamId();
 
     @Override
     public void action() {
         ZonedDateTime currZonedDateTime = Utils.getCurrentZonedDateTime(mock);
-        long currIntervalTimeSec = currZonedDateTime.toInstant().toEpochMilli() / (interval * 1000);
+        long currIntervalTimeSec = currZonedDateTime.toInstant().toEpochMilli() / (getInterval() * 1000);
         if (lastEmitIntervalTimeSec == 0) {
 
             lastEmitIntervalTimeSec = currIntervalTimeSec;
@@ -107,10 +104,10 @@ public class Level1BarFilterBolt extends BaseRichBolt implements TickAction {
                 String baseTimestamp = currZonedDateTime.format(TimeUtils.dateTimeSecFormatter);
 
                 if (count != 0) {
-                    outputCollector.emit(STREAM_ID, new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),interval, low, high, open, close, volume));
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),getInterval(), low, high, open, close, volume));
 //                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), interval,low, high, open, close, volume));
                 } else {
-                    outputCollector.emit(STREAM_ID, new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),interval, Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
 //                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),interval, Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
                 }
             }

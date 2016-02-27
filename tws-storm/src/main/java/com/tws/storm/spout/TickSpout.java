@@ -18,7 +18,9 @@ import java.util.concurrent.*;
  */
 public class TickSpout extends BaseRichSpout {
 
-    private static final String STREAM_ID = "S_TICK";
+    public static final String STREAM_ID = "S_TICK";
+    public static final String COMPONENT_ID = "C_TICK_SPOUT";
+
     public static BlockingQueue<Boolean> queue = new LinkedBlockingDeque<>();
     private SpoutOutputCollector collector;
 

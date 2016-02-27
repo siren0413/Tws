@@ -21,7 +21,9 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class Level1SummarySpout extends BaseRichSpout {
 
-    private static final String STREAM_ID = "S_LEVEL1_SUMMARY";
+    public static final String STREAM_ID = "S_LEVEL1_SUMMARY";
+    public static final String COMPONENT_ID = "C_LEVEL1_SUMMARY_SPOUT";
+
     public static BlockingQueue<Level1Summary> queue = new LinkedBlockingDeque<>();
     private SpoutOutputCollector collector;
 
