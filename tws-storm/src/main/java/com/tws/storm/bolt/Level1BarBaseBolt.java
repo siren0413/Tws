@@ -6,6 +6,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import backtype.storm.utils.Time;
 import com.tws.shared.common.TimeUtils;
 import com.tws.storm.TickAction;
 import com.tws.storm.TupleDefinition;
@@ -13,6 +14,7 @@ import com.tws.storm.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.Map;
@@ -102,14 +104,14 @@ public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickActi
                     count++;
                 }
 
-                String baseTimestamp = currZonedDateTime.format(TimeUtils.dateTimeSecFormatter);
+                String baseTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currIntervalTimeSec * getInterval() * 1000), TimeUtils.ZONE_EST).format(TimeUtils.dateTimeSecFormatter);
 
                 if (count != 0) {
-                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), low, high, open, close, volume));
-//                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), low, high, open, close, volume));
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), low, high, open, close, volume));
+                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), low, high, open, close, volume));
                 } else {
-                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
-//                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
                 }
             }
             lastEmitIntervalTimeSec = currIntervalTimeSec;
