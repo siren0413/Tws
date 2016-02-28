@@ -3,12 +3,12 @@ package com.tws.storm.bolt;
 /**
  * Created by chris on 2/27/16.
  */
-public class Level1SMA60SecBolt extends Level1SMABaseBolt {
+public class Level1SMA3600SecBolt extends Level1SMABaseBolt {
 
-    public static final String STREAM_ID = "S_SMA_60_SEC";
-    public static final String COMPONENT_ID = "C_LEVEL1_SIXTY_SECOND_SMA_BOLT";
+    public static final String STREAM_ID = "S_SMA_1_HOUR";
+    public static final String COMPONENT_ID = "C_LEVEL1_ONE_HOUR_SMA_BOLT";
 
-    private static final int interval = 60;
+    private static final int interval = 3600;
 
     @Override
     protected int getInterval() {
@@ -22,6 +22,6 @@ public class Level1SMA60SecBolt extends Level1SMABaseBolt {
 
     @Override
     protected int getDBQueryInterval() {
-        return 1;
+        return 60;
     }
 }

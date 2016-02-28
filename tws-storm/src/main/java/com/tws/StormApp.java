@@ -34,7 +34,15 @@ public class StormApp {
         builder.setSpout(TickSpout.COMPONENT_ID, new TickSpout(), 1).setNumTasks(1);
 
         builder.setBolt(Level1Bar1SecBolt.COMPONENT_ID, new Level1Bar1SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
-        builder.setBolt(Level1SMA60SecBolt.COMPONENT_ID, new Level1SMA60SecBolt()).fieldsGrouping(Level1Bar1SecBolt.COMPONENT_ID, Level1Bar1SecBolt.STREAM_ID, new Fields(Constants.SYMBOL));
+        builder.setBolt(Level1Bar5SecBolt.COMPONENT_ID, new Level1Bar5SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
+        builder.setBolt(Level1Bar60SecBolt.COMPONENT_ID, new Level1Bar60SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
+        builder.setBolt(Level1Bar300SecBolt.COMPONENT_ID, new Level1Bar300SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
+        builder.setBolt(Level1Bar600SecBolt.COMPONENT_ID, new Level1Bar600SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
+        builder.setBolt(Level1Bar3600SecBolt.COMPONENT_ID, new Level1Bar3600SecBolt()).fieldsGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID, new Fields(Constants.SYMBOL)).shuffleGrouping(TickSpout.COMPONENT_ID, TickSpout.STREAM_ID);
+
+//        builder.setBolt(Level1SMA60SecBolt.COMPONENT_ID, new Level1SMA60SecBolt()).fieldsGrouping(Level1Bar1SecBolt.COMPONENT_ID, Level1Bar1SecBolt.STREAM_ID, new Fields(Constants.SYMBOL));
+//        builder.setBolt(Level1SMA300SecBolt.COMPONENT_ID, new Level1SMA300SecBolt()).fieldsGrouping(Level1Bar60SecBolt.COMPONENT_ID, Level1Bar60SecBolt.STREAM_ID, new Fields(Constants.SYMBOL));
+        builder.setBolt(Level1SMA600SecBolt.COMPONENT_ID, new Level1SMA600SecBolt()).fieldsGrouping(Level1Bar60SecBolt.COMPONENT_ID, Level1Bar60SecBolt.STREAM_ID, new Fields(Constants.SYMBOL));
 
         builder.setBolt(MockTimeUpdateBolt.COMPONENT_ID, new MockTimeUpdateBolt()).shuffleGrouping(Level1UpdateSpout.COMPONENT_ID, Level1UpdateSpout.STREAM_ID);
 
