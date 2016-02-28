@@ -14,23 +14,6 @@ public class BarData {
     public BarData() {
     }
 
-    public BarData(float low, float high, float open, float close, int volume, int cumulatedVolume) {
-        this.low = low;
-        this.high = high;
-        this.open = open;
-        this.close = close;
-        this.volume = volume;
-        this.openVolume = cumulatedVolume;
-    }
-
-    public BarData(float low, float high, float close, int volume, int cumulatedVolume) {
-        this.low = low;
-        this.high = high;
-        this.close = close;
-        this.volume = volume;
-        this.openVolume = cumulatedVolume;
-    }
-
     public float getLow() {
         return low;
     }

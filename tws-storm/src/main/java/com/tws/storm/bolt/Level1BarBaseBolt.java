@@ -6,19 +6,17 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Time;
 import com.tws.shared.common.TimeUtils;
 import com.tws.storm.TickAction;
 import com.tws.storm.TupleDefinition;
 import com.tws.storm.Utils;
+import com.tws.storm.model.BarData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.tws.shared.Constants.*;
@@ -31,7 +29,7 @@ public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickActi
     private static final Logger logger = LoggerFactory.getLogger(Level1BarBaseBolt.class);
 
     private OutputCollector outputCollector;
-    private final Map<String, Queue<Tuple>> map = new ConcurrentHashMap<>();
+    private final Map<String, BarData> map = new ConcurrentHashMap<>();
     private boolean mock = false;
     private long lastEmitIntervalTimeSec = 0;
 
@@ -46,11 +44,29 @@ public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickActi
         if (!input.getSourceStreamId().equals("S_TICK")) {
             String symbol = input.getStringByField(SYMBOL);
 
-            if (!map.containsKey(symbol)) {
-                map.put(symbol, new LinkedList<>());
+            float newPrice = (input.getFloatByField(BID) + input.getFloatByField(ASK)) / 2;
+            int newVolume = input.getIntegerByField(TOTAL_VOLUME);
+
+            if (!map.containsKey(symbol) || map.get(symbol) == null) {
+                BarData barData = new BarData();
+                barData.setLow(newPrice);
+                barData.setHigh(newPrice);
+                barData.setOpen(newPrice);
+                barData.setClose(newPrice);
+                barData.setOpenVolume(newVolume);
+                barData.setVolume(0);
+                map.put(symbol, barData);
+            } else {
+                BarData oldBarData = map.get(symbol);
+                BarData newBarData = new BarData();
+                newBarData.setLow(Float.min(oldBarData.getLow(), newPrice));
+                newBarData.setHigh(Float.max(oldBarData.getHigh(), newPrice));
+                newBarData.setOpen(oldBarData.getOpen());
+                newBarData.setClose(newPrice);
+                newBarData.setOpenVolume(oldBarData.getOpenVolume());
+                newBarData.setVolume(newVolume - oldBarData.getOpenVolume());
+                map.put(symbol, newBarData);
             }
-            Queue<Tuple> queue = map.get(symbol);
-            queue.add(input);
         }
         action();
     }
@@ -71,48 +87,23 @@ public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickActi
         if (lastEmitIntervalTimeSec == 0) {
 
             lastEmitIntervalTimeSec = currIntervalTimeSec;
-            map.values().forEach(Queue<Tuple>::clear);
+            map.clear();
 
         } else if (lastEmitIntervalTimeSec < currIntervalTimeSec) {
-            for (Map.Entry<String, Queue<Tuple>> entry : map.entrySet()) {
+            for (Map.Entry<String, BarData> entry : map.entrySet()) {
                 String symbol = entry.getKey();
-                Queue<Tuple> queue = entry.getValue();
-
-                float total = 0;
-                float low = Float.MAX_VALUE;
-                float high = 0;
-                float open = 0;
-                float close = 0;
-                int volume = 0;
-                int count = 0;
-
-                while (!queue.isEmpty()) {
-                    Tuple tuple = queue.poll();
-                    float price = (tuple.getFloatByField(BID) + tuple.getFloatByField(ASK)) / 2;
-
-                    total += price;
-                    low = Float.min(low, price);
-                    high = Float.max(high, price);
-                    if (open == 0) {
-                        open = price;
-                        volume = tuple.getIntegerByField(TOTAL_VOLUME);
-                    }
-                    if (queue.isEmpty()) {
-                        close = price;
-                        volume = tuple.getIntegerByField(TOTAL_VOLUME) - volume;
-                    }
-                    count++;
-                }
+                BarData barData = entry.getValue();
 
                 String baseTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(currIntervalTimeSec * getInterval() * 1000), TimeUtils.ZONE_EST).format(TimeUtils.dateTimeSecFormatter);
 
-                if (count != 0) {
-                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), low, high, open, close, volume));
-                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), low, high, open, close, volume));
+                if (barData != null) {
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), barData.getLow(), barData.getHigh(), barData.getOpen(), barData.getClose(), barData.getVolume()));
+                    System.out.println(new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), barData.getLow(), barData.getHigh(), barData.getOpen(), barData.getClose(), barData.getVolume()));
                 } else {
                     outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
-                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+                    System.out.println(new Values(symbol, baseTimestamp, currIntervalTimeSec * getInterval() * 1000, getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
                 }
+                map.remove(symbol);
             }
             lastEmitIntervalTimeSec = currIntervalTimeSec;
         }
