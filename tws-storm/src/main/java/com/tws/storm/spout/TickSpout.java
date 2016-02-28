@@ -8,7 +8,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.tws.shared.iqfeed.model.Level1Update;
 import com.tws.storm.TupleDefinition;
+import com.tws.storm.Utils;
 
+import java.time.DayOfWeek;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -23,10 +26,12 @@ public class TickSpout extends BaseRichSpout {
 
     public static BlockingQueue<Boolean> queue = new LinkedBlockingDeque<>();
     private SpoutOutputCollector collector;
+    private boolean mock;
 
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         this.collector = collector;
+        mock = (boolean) conf.get("mock");
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -40,6 +45,14 @@ public class TickSpout extends BaseRichSpout {
     public void nextTuple() {
         try {
             Boolean tick = TickSpout.queue.take();
+
+            ZonedDateTime currZonedDateTime = Utils.getCurrentZonedDateTime(mock);
+            if (currZonedDateTime.getHour() >= 20 || currZonedDateTime.getHour() < 4) {
+                return;
+            }else if(currZonedDateTime.getDayOfWeek() == DayOfWeek.SATURDAY || currZonedDateTime.getDayOfWeek() == DayOfWeek.SUNDAY){
+                return;
+            }
+
             collector.emit(STREAM_ID, new Values(true));
         } catch (InterruptedException e) {
             e.printStackTrace();

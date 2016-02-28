@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -78,7 +79,7 @@ public abstract class Level1SMABaseBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         ZonedDateTime currZonedDateTime = LocalDateTime.parse(input.getStringByField(TIMESTAMP), TimeUtils.dateTimeSecFormatter).atZone(TimeUtils.ZONE_EST);
-        ZonedDateTime startZonedDateTime = currZonedDateTime.minusSeconds(getInterval());
+        ZonedDateTime startZonedDateTime = calculateStartZonedDateTime(currZonedDateTime);
 
         int barInterval = input.getIntegerByField(INTERVAL);
         Float close = input.getFloatByField(CLOSE);
@@ -107,12 +108,24 @@ public abstract class Level1SMABaseBolt extends BaseRichBolt {
         float confidence = (float) count * barInterval / (float) getInterval();
         float avg = total / count;
         outputCollector.emit(getStreamId(), new Values(symbol, currZonedDateTime.format(TimeUtils.dateTimeSecFormatter), currZonedDateTime.toInstant().toEpochMilli(), avg, confidence));
-        System.out.println(new Values(symbol, currZonedDateTime.format(TimeUtils.dateTimeSecFormatter), currZonedDateTime.toInstant().toEpochMilli(), avg, confidence));
+//        System.out.println(new Values(symbol, currZonedDateTime.format(TimeUtils.dateTimeSecFormatter), currZonedDateTime.toInstant().toEpochMilli(), avg, confidence));
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declareStream(getStreamId(), TupleDefinition.S_LEVEL1_SMA);
+    }
+
+    private ZonedDateTime calculateStartZonedDateTime(ZonedDateTime currZonedDateTime){
+        if(currZonedDateTime.minusSeconds(getInterval()).getHour() < 4){
+            if(currZonedDateTime.getDayOfWeek() == DayOfWeek.MONDAY){
+                return currZonedDateTime.minusDays(2).minusHours(8).minusSeconds(getInterval());
+            }else{
+                return currZonedDateTime.minusHours(8).minusSeconds(getInterval());
+            }
+        }else{
+            return currZonedDateTime.minusSeconds(getInterval());
+        }
     }
 
     protected abstract int getInterval();

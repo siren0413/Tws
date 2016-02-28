@@ -59,6 +59,7 @@ public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickActi
     }
 
     protected abstract int getInterval();
+
     protected abstract String getStreamId();
 
     @Override
@@ -104,11 +105,11 @@ public abstract class Level1BarBaseBolt extends BaseRichBolt implements TickActi
                 String baseTimestamp = currZonedDateTime.format(TimeUtils.dateTimeSecFormatter);
 
                 if (count != 0) {
-                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),getInterval(), low, high, open, close, volume));
-//                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), interval,low, high, open, close, volume));
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), low, high, open, close, volume));
+//                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), low, high, open, close, volume));
                 } else {
-                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
-//                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(),interval, Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+                    outputCollector.emit(getStreamId(), new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
+//                    System.out.println(new Values(symbol, baseTimestamp, currZonedDateTime.toInstant().toEpochMilli(), getInterval(), Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0));
                 }
             }
             lastEmitIntervalTimeSec = currIntervalTimeSec;
