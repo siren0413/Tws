@@ -7,6 +7,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.datastax.driver.mapping.Result;
+import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.tws.cassandra.model.HistoryIntervalDB;
 import com.tws.cassandra.repo.HistoryIntervalRepository;
@@ -36,10 +37,9 @@ public abstract class Level1SMABaseBolt extends BaseRichBolt {
 
     private boolean mock = false;
     private OutputCollector outputCollector;
-    private final Map<String, PriorityQueue<SMAData>> map = new ConcurrentHashMap<>();
+    private final Map<String, MinMaxPriorityQueue<SMAData>> map = new ConcurrentHashMap<>();
 
     private HistoryIntervalRepository repository;
-
 
 
     @Override
@@ -55,21 +55,20 @@ public abstract class Level1SMABaseBolt extends BaseRichBolt {
         ZonedDateTime currZonedDateTime = Utils.getCurrentZonedDateTime(mock);
 
         for (String symbol : symbolList) {
-            PriorityQueue<SMAData> queue = new PriorityQueue<SMAData>(new Comparator<SMAData>() {
+            MinMaxPriorityQueue<SMAData> queue = MinMaxPriorityQueue.<SMAData>orderedBy(new Comparator<SMAData>() {
                 @Override
                 public int compare(SMAData o1, SMAData o2) {
                     return Long.valueOf(o1.getTime()).compareTo(o2.getTime());
                 }
-            });
+            }).create();
             map.put(symbol, queue);
 
-            ListenableFuture<Result<HistoryIntervalDB>> future = repository.getIntervalInTimeForPoints(symbol, 1, currZonedDateTime.toInstant().toEpochMilli(), getInterval());
+            ListenableFuture<Result<HistoryIntervalDB>> future = repository.getIntervalInTimeForPoints(symbol, getDBQueryInterval(), currZonedDateTime.toInstant().toEpochMilli(), getInterval() / getDBQueryInterval());
             try {
                 Result<HistoryIntervalDB> resultSet = future.get(getInterval(), TimeUnit.SECONDS);
                 for (HistoryIntervalDB historyIntervalDB : resultSet) {
                     queue.add(new SMAData(historyIntervalDB.getTime(), historyIntervalDB.getClose()));
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -85,19 +84,20 @@ public abstract class Level1SMABaseBolt extends BaseRichBolt {
         Float close = input.getFloatByField(CLOSE);
         long time = input.getLongByField(TIME);
         String symbol = input.getStringByField(SYMBOL);
-        PriorityQueue<SMAData> queue = map.get(symbol);
+        MinMaxPriorityQueue<SMAData> queue = map.get(symbol);
+
+        while (!queue.isEmpty() && queue.peekFirst().getTime() <= startZonedDateTime.toInstant().toEpochMilli()) {
+            queue.pollFirst();
+        }
+
+        while (!queue.isEmpty() && ((queue.peekLast().getTime() / (barInterval * 1000)) == (time / (barInterval * 1000)))) {
+            queue.pollLast();
+        }
 
         if (!close.isNaN()) {
-            queue.add(new SMAData(time, close));
+            queue.offer(new SMAData(time, close));
         }
-        while (!queue.isEmpty()) {
-            SMAData headData = queue.peek();
-            if (headData.getTime() <= startZonedDateTime.toInstant().toEpochMilli()) {
-                queue.poll();
-            } else {
-                break;
-            }
-        }
+
         int count = 0;
         float total = 0;
         for (SMAData data : queue) {
@@ -116,5 +116,8 @@ public abstract class Level1SMABaseBolt extends BaseRichBolt {
     }
 
     protected abstract int getInterval();
+
     protected abstract String getStreamId();
+
+    protected abstract int getDBQueryInterval();
 }

@@ -41,6 +41,5 @@ public class StormApp {
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("test", conf, builder.createTopology());
 
-
     }
 }

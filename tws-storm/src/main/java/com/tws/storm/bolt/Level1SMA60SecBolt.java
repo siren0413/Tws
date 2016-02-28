@@ -19,4 +19,9 @@ public class Level1SMA60SecBolt extends Level1SMABaseBolt {
     protected String getStreamId() {
         return STREAM_ID;
     }
+
+    @Override
+    protected int getDBQueryInterval() {
+        return 5;
+    }
 }
